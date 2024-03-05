@@ -54,7 +54,6 @@ func (p *GcpPubSubSubscriptionsProbe) Check(ctx context.Context) *healthcheck.Ch
 				messages = append(messages, fmt.Sprintf("subscription %s exists", subscriptionName))
 			}
 		}
-
 	}
 
 	return healthcheck.NewCheckerProbeResult(success, strings.Join(messages, ", "))

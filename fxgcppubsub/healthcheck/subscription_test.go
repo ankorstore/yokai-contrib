@@ -80,7 +80,6 @@ func TestWithMissingSubscriptions(t *testing.T) {
 			})
 			assert.NoError(t, err)
 		}
-
 	}
 
 	p := fxgcppubsubhealthcheck.NewGcpPubSubSubscriptionsProbe(conf, client)

@@ -54,7 +54,6 @@ func (p *GcpPubSubTopicsProbe) Check(ctx context.Context) *healthcheck.CheckerPr
 				messages = append(messages, fmt.Sprintf("topic %s exists", topicName))
 			}
 		}
-
 	}
 
 	return healthcheck.NewCheckerProbeResult(success, strings.Join(messages, ", "))

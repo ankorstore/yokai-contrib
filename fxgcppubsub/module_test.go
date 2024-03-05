@@ -50,7 +50,7 @@ func TestFxGcpPubSubClient(t *testing.T) {
 	assert.Equal(t, "project-test", client.Project())
 
 	err = app.Stop(context.Background())
-	assert.NoError(t, app.Err(), "failed to close pubsub.Client")
+	assert.NoError(t, err, "failed to close pubsub.Client")
 }
 
 func TestFxGcpPubSubClientWithoutProjectId(t *testing.T) {
