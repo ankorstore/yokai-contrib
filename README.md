@@ -8,9 +8,9 @@
 
 ## Modules
 
-| Module      | Description                                                  |
-|-------------|--------------------------------------------------------------|
-| fxgcppubsub | Module for [Google Pub/Sub](https://cloud.google.com/pubsub) |
+| Module                     | Description                                                  |
+|----------------------------|--------------------------------------------------------------|
+| [fxgcppubsub](fxgcppubsub) | Module for [Google Pub/Sub](https://cloud.google.com/pubsub) |
 
 ## Contributing
 
