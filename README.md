@@ -2,14 +2,15 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Go version](https://img.shields.io/badge/Go-≥1.20-blue)](https://go.dev/)
+[![codecov](https://codecov.io/gh/ankorstore/yokai-contrib/graph/badge.svg?token=CxImMei31C)](https://codecov.io/gh/ankorstore/yokai-contrib)
 
 > Contrib modules repository for the [Yokai](https://github.com/ankorstore/yokai) framework.
 
 ## Modules
 
-| Module | Description |
-|--------|-------------|
-
+| Module      | Description                                                  |
+|-------------|--------------------------------------------------------------|
+| fxgcppubsub | Module for [Google Pub/Sub](https://cloud.google.com/pubsub) |
 
 ## Contributing
 

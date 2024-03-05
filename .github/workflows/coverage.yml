@@ -1,0 +1,52 @@
+name: coverage
+
+on:
+  push:
+    branches:
+      - main
+  workflow_call:
+    inputs:
+      go_version:
+        required: false
+        type: string
+        default: "1.20.0"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module:
+        - "fxgcppubsub"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go_version }}
+      - name: Install dependencies for module ${{ matrix.module }}
+        working-directory: ${{ matrix.module }}
+        run: go mod download
+      - name: Run tests for module ${{ matrix.module }}
+        working-directory: ${{ matrix.module }}
+        run: go test -v -race -failfast -coverpkg=./... -covermode=atomic -coverprofile=coverage.tmp.out ./...
+      - name: Exclude testdata
+        working-directory: ${{ matrix.module}}
+        run: cat coverage.tmp.out | grep -v "testdata" > coverage.out
+      - name: Clean temp coverage
+        working-directory: ${{ matrix.module }}
+        run: rm coverage.tmp.out
+      - name: Codecov for module ${{ matrix.module }}
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: false
+          flags: ${{ matrix.module }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
