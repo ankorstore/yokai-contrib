@@ -1,10 +1,10 @@
 # Fx Google Pub/Sub Module
 
-[![ci](https://github.com/ankorstore/yokai/actions/workflows/fxgcppubsub-ci.yml/badge.svg)](https://github.com/ankorstore/yokai/actions/workflows/fxgcppubsub-ci.yml)
-[![go report](https://goreportcard.com/badge/github.com/ankorstore/yokai/fxgcppubsub)](https://goreportcard.com/report/github.com/ankorstore/yokai/fxgcppubsub)
-[![codecov](https://codecov.io/gh/ankorstore/yokai/graph/badge.svg?token=ghUBlFsjhR&flag=fxgcppubsub)](https://app.codecov.io/gh/ankorstore/yokai/tree/main/fxgcppubsub)
-[![Deps](https://img.shields.io/badge/osi-deps-blue)](https://deps.dev/go/github.com%2Fankorstore%2Fyokai%2Ffxgcppubsub)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/ankorstore/yokai/fxgcppubsub)](https://pkg.go.dev/github.com/ankorstore/yokai/fxgcppubsub)
+[![ci](https://github.com/ankorstore/yokai-contrib/actions/workflows/fxgcppubsub-ci.yml/badge.svg)](https://github.com/ankorstore/yokai-contrib/actions/workflows/fxgcppubsub-ci.yml)
+[![go report](https://goreportcard.com/badge/github.com/ankorstore/yokai-contrib/fxgcppubsub)](https://goreportcard.com/report/github.com/ankorstore/yokai-contrib/fxgcppubsub)
+[![codecov](https://codecov.io/gh/ankorstore/yokai-contrib/graph/badge.svg?token=ghUBlFsjhR&flag=fxgcppubsub)](https://app.codecov.io/gh/ankorstore/yokai-contrib/tree/main/fxgcppubsub)
+[![Deps](https://img.shields.io/badge/osi-deps-blue)](https://deps.dev/go/github.com%2Fankorstore%2Fyokai-contrib%2Ffxgcppubsub)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/ankorstore/yokai-contrib/fxgcppubsub)](https://pkg.go.dev/github.com/ankorstore/yokai-contrib/fxgcppubsub)
 
 > [Fx](https://uber-go.github.io/fx/) module for [Google Pub/Sub](https://cloud.google.com/pubsub).
 
