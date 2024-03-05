@@ -26,7 +26,7 @@ var FxGcpPubSubModule = fx.Module(
 	),
 )
 
-// FxGcpPubSubClientParam allows injection of the required dependencies in [NewFxPubSub].
+// FxGcpPubSubClientParam allows injection of the required dependencies in [NewFxGcpPubSubClient].
 type FxGcpPubSubClientParam struct {
 	fx.In
 	LifeCycle fx.Lifecycle
