@@ -1,0 +1,15 @@
+app:
+  name: test-app
+modules:
+  gcppubsub:
+    project:
+      id: ${GCP_PROJECT_ID}
+    healthcheck:
+      topics:
+        - topic1
+        - topic2
+        - topic3
+      subscriptions:
+        - subscription1
+        - subscription2
+        - subscription3

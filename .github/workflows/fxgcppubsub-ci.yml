@@ -1,0 +1,31 @@
+name: "fxgcppubsub-ci"
+
+on:
+    push:
+        branches:
+            - "feat**"
+            - "fix**"
+            - "hotfix**"
+            - "chore**"
+        paths:
+            - "fxgcppubsub/**.go"
+            - "fxgcppubsub/go.mod"
+            - "fxgcppubsub/go.sum"
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+        branches:
+            - main
+        paths:
+            - "fxgcppubsub/**.go"
+            - "fxgcppubsub/go.mod"
+            - "fxgcppubsub/go.sum"
+
+jobs:
+    ci:
+        uses: ./.github/workflows/common-ci.yml
+        secrets: inherit
+        with:
+            module: "fxgcppubsub"

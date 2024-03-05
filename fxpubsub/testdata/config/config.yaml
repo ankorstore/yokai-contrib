@@ -1,9 +1,0 @@
-modules:
-  log:
-    level: debug
-    output: test
-  pubsub:
-    project:
-      id: ${GCP_PROJECT_ID}
-    healthcheck:
-      topics: test-topic

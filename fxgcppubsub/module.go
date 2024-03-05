@@ -1,4 +1,4 @@
-package fxpubsub
+package fxgcppubsub
 
 import (
 	"context"
@@ -14,42 +14,36 @@ import (
 )
 
 // ModuleName is the module name.
-const ModuleName = "pubsub"
+const ModuleName = "gcppubsub"
 
-// FxPubSubModule is the [Fx] pubsub module.
+// FxGcpPubSubModule is the [Fx] pubsub module.
 //
 // [Fx]: https://github.com/uber-go/fx
-var FxPubSubModule = fx.Module(
+var FxGcpPubSubModule = fx.Module(
 	ModuleName,
 	fx.Provide(
-		NewFxPubSub,
+		NewFxGcpPubSubClient,
 	),
 )
 
-// FxPubSubParam allows injection of the required dependencies in [NewFxPubSub].
-type FxPubSubParam struct {
+// FxGcpPubSubClientParam allows injection of the required dependencies in [NewFxPubSub].
+type FxGcpPubSubClientParam struct {
 	fx.In
 	LifeCycle fx.Lifecycle
 	Config    *config.Config
 }
 
-// NewFxPubSub returns a [pubsub.Client].
-func NewFxPubSub(p FxPubSubParam) (*pubsub.Client, error) {
-	var client *pubsub.Client
-	var err error
-
-	// client
+// NewFxGcpPubSubClient returns a [pubsub.Client].
+func NewFxGcpPubSubClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 	if p.Config.IsTestEnv() {
-		client, err = createTestClient(p)
+		return createTestClient(p)
 	} else {
-		client, err = createClient(p)
+		return createClient(p)
 	}
-
-	return client, err
 }
 
-func createClient(p FxPubSubParam) (*pubsub.Client, error) {
-	client, err := pubsub.NewClient(context.Background(), p.Config.GetString("modules.pubsub.project.id"))
+func createClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
+	client, err := pubsub.NewClient(context.Background(), p.Config.GetString("modules.gcppubsub.project.id"))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pubsub client: %w", err)
 	}
@@ -63,8 +57,9 @@ func createClient(p FxPubSubParam) (*pubsub.Client, error) {
 	return client, nil
 }
 
-func createTestClient(p FxPubSubParam) (*pubsub.Client, error) {
+func createTestClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 	srv := pstest.NewServer()
+
 	conn, err := grpc.Dial(srv.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
@@ -72,7 +67,7 @@ func createTestClient(p FxPubSubParam) (*pubsub.Client, error) {
 
 	client, err := pubsub.NewClient(
 		context.Background(),
-		p.Config.GetString("modules.pubsub.project.id"),
+		p.Config.GetString("modules.gcppubsub.project.id"),
 		option.WithGRPCConn(conn),
 	)
 	if err != nil {
