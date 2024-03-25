@@ -44,7 +44,7 @@ func createClient(p FxSlackClientParam) *slack.Client {
 		Transport: p.HttpRoundTripper,
 	}
 
-	client := slack.New(p.Config.GetString("modules.slack.token"), slack.OptionHTTPClient(httpClient))
+	client := slack.New(p.Config.GetString("modules.slack.token"), slack.OptionHTTPClient(httpClient), slack.OptionAppLevelToken(p.Config.GetString("modules.slack.app_level_token")))
 
 	return client
 }
@@ -58,7 +58,7 @@ func createTestClient(p FxSlackClientParam) *slack.Client {
 		Transport: p.HttpRoundTripper,
 	}
 
-	client := slack.New(p.Config.GetString("modules.slack.token"), slack.OptionHTTPClient(httpClient), slack.OptionAPIURL(server.GetAPIURL()))
+	client := slack.New(p.Config.GetString("modules.slack.token"), slack.OptionHTTPClient(httpClient), slack.OptionAppLevelToken(p.Config.GetString("modules.slack.app_level_token")), slack.OptionAPIURL(server.GetAPIURL()))
 
 	return client
 }

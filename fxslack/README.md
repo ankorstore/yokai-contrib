@@ -60,7 +60,8 @@ app:
   debug: true
 modules:
   slack:
-    token: ${SLACK_TOKEN}  # Slack Token
+    auth_token: ${SLACK_AUTH_TOKEN}  # Slack Auth Token
+	app_level_token: ${SLACK_APP_LEVEL_TOKEN} # Slack App level Token
 ```
 
 ## Testing
