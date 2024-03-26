@@ -33,7 +33,7 @@ func TestFxSlackModule(t *testing.T) {
 }
 
 func TestFxSlackClient(t *testing.T) {
-	t.Setenv("APP_ENV", "dev")
+	t.Setenv("APP_ENV", config.AppEnvDev)
 	t.Setenv("APP_CONFIG_PATH", "testdata/config")
 	t.Setenv("TOKEN", "my-token")
 

@@ -19,9 +19,11 @@
 ## Overview
 
 This module provides to your Fx application a [slack.Client](https://pkg.go.dev/github.com/slack-go/slack#Client),
-that you can `inject` anywhere to interact with the Slack API.
+that you can `inject` anywhere to interact with the [Slack API](https://api.slack.com).
 
 ## Installation
+
+This module requires [fxhttpclient](https://github.com/ankorstore/yokai/tree/main/fxhttpclient).
 
 First install the module:
 
@@ -61,7 +63,7 @@ app:
 modules:
   slack:
     auth_token: ${SLACK_AUTH_TOKEN}  # Slack Auth Token
-	app_level_token: ${SLACK_APP_LEVEL_TOKEN} # Slack App level Token
+	  app_level_token: ${SLACK_APP_LEVEL_TOKEN} # Slack App level Token
 ```
 
 ## Testing
