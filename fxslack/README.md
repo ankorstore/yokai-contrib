@@ -1,12 +1,12 @@
 # Fx Slack Module
 
-[![ci](https://github.com/ankorstore/yokai-contrib/actions/workflows/fxgcppubsub-ci.yml/badge.svg)](https://github.com/ankorstore/yokai-contrib/actions/workflows/fxgcppubsub-ci.yml)
-[![go report](https://goreportcard.com/badge/github.com/ankorstore/yokai-contrib/fxgcppubsub)](https://goreportcard.com/report/github.com/ankorstore/yokai-contrib/fxgcppubsub)
-[![codecov](https://codecov.io/gh/ankorstore/yokai-contrib/graph/badge.svg?token=ghUBlFsjhR&flag=fxgcppubsub)](https://app.codecov.io/gh/ankorstore/yokai-contrib/tree/main/fxgcppubsub)
-[![Deps](https://img.shields.io/badge/osi-deps-blue)](https://deps.dev/go/github.com%2Fankorstore%2Fyokai-contrib%2Ffxgcppubsub)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/ankorstore/yokai-contrib/fxgcppubsub)](https://pkg.go.dev/github.com/ankorstore/yokai-contrib/fxgcppubsub)
+[![ci](https://github.com/ankorstore/yokai-contrib/actions/workflows/fxslack-ci.yml/badge.svg)](https://github.com/ankorstore/yokai-contrib/actions/workflows/fxslack-ci.yml)
+[![go report](https://goreportcard.com/badge/github.com/ankorstore/yokai-contrib/fxslack)](https://goreportcard.com/report/github.com/ankorstore/yokai-contrib/fxslack)
+[![codecov](https://codecov.io/gh/ankorstore/yokai-contrib/graph/badge.svg?token=ghUBlFsjhR&flag=fxslack)](https://app.codecov.io/gh/ankorstore/yokai-contrib/tree/main/fxslack)
+[![Deps](https://img.shields.io/badge/osi-deps-blue)](https://deps.dev/go/github.com%2Fankorstore%2Fyokai-contrib%2Ffxslack)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/ankorstore/yokai-contrib/fxslack)](https://pkg.go.dev/github.com/ankorstore/yokai-contrib/fxslack)
 
-> [Fx](https://uber-go.github.io/fx/) module for [GCP Pub/Sub](https://cloud.google.com/pubsub).
+> [Fx](https://uber-go.github.io/fx/) module for [Slack](https://api.slack.com).
 
 <!-- TOC -->
 * [Overview](#overview)
