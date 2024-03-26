@@ -56,3 +56,31 @@ func TestFxSlackClient(t *testing.T) {
 	err = app.Stop(context.Background())
 	assert.NoError(t, err, "failed to close slack.Client")
 }
+
+func TestFxSlackTestClient(t *testing.T) {
+	t.Setenv("APP_ENV", config.AppEnvTest)
+	t.Setenv("APP_CONFIG_PATH", "testdata/config")
+	t.Setenv("TOKEN", "my-token")
+
+	var conf *config.Config
+	var client *slack.Client
+
+	var roundTripperProvide = func() http.RoundTripper {
+		return http.DefaultTransport
+	}
+
+	app := fx.New(
+		fx.NopLogger,
+		fxconfig.FxConfigModule,
+		fxslack.FxSlackModule,
+		fx.Populate(&conf, &client),
+		fx.Provide(roundTripperProvide),
+	)
+
+	err := app.Start(context.Background())
+	assert.NoError(t, err, "failed to create test slack.Client")
+	assert.NotNil(t, client)
+
+	err = app.Stop(context.Background())
+	assert.NoError(t, err, "failed to close test slack.Client")
+}
