@@ -11,6 +11,7 @@
 | Module                     | Description                                               |
 |----------------------------|-----------------------------------------------------------|
 | [fxgcppubsub](fxgcppubsub) | Module for [GCP Pub/Sub](https://cloud.google.com/pubsub) |
+| [fxslack](fxslack) | Module for [Slack](https://api.slack.com/) |
 
 ## Contributing
 

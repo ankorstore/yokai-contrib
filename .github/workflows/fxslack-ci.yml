@@ -1,0 +1,31 @@
+name: "fxslack-ci"
+
+on:
+    push:
+        branches:
+            - "feat**"
+            - "fix**"
+            - "hotfix**"
+            - "chore**"
+        paths:
+            - "fxslack/**.go"
+            - "fxslack/go.mod"
+            - "fxslack/go.sum"
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+        branches:
+            - main
+        paths:
+            - "fxslack/**.go"
+            - "fxslack/go.mod"
+            - "fxslack/go.sum"
+
+jobs:
+    ci:
+        uses: ./.github/workflows/common-ci.yml
+        secrets: inherit
+        with:
+            module: "fxslack"
