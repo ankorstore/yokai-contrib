@@ -1,5 +1,6 @@
 app:
   name: test-app
 modules:
-  gcppubsub:
-    token: ${SLACK_TOKEN}
+  slack:
+    token: my-token
+  

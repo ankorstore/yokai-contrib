@@ -1,6 +1,7 @@
 package fxslack
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/ankorstore/yokai/config"
@@ -19,24 +20,53 @@ var FxSlackModule = fx.Module(
 	ModuleName,
 	fx.Provide(
 		NewSlackClient,
+		NewSlackTestServer,
 	),
 )
 
-// FxSlackClientParam allows injection of the required dependencies in [NewSlackClient].
 type FxSlackClientParam struct {
 	fx.In
 	LifeCycle        fx.Lifecycle
 	HttpRoundTripper http.RoundTripper
 	Config           *config.Config
+	TestServer       *slacktest.Server
 }
 
-// NewSlackClient returns a [slack.Client].
 func NewSlackClient(p FxSlackClientParam) *slack.Client {
 	if p.Config.IsTestEnv() {
 		return createTestClient(p)
 	} else {
 		return createClient(p)
 	}
+}
+
+type FxSlackTestServerParam struct {
+	fx.In
+	LifeCycle fx.Lifecycle
+	Config    *config.Config
+}
+
+func NewSlackTestServer(p FxSlackTestServerParam) *slacktest.Server {
+	if p.Config.IsTestEnv() {
+		server := slacktest.NewTestServer()
+
+		p.LifeCycle.Append(fx.Hook{
+			OnStart: func(context.Context) error {
+				go server.Start()
+
+				return nil
+			},
+			OnStop: func(context.Context) error {
+				server.Stop()
+
+				return nil
+			},
+		})
+
+		return server
+	}
+
+	return nil
 }
 
 func createClient(p FxSlackClientParam) *slack.Client {
@@ -50,9 +80,7 @@ func createClient(p FxSlackClientParam) *slack.Client {
 }
 
 func createTestClient(p FxSlackClientParam) *slack.Client {
-	server := slacktest.NewTestServer()
-
-	go server.Start()
+	server := p.TestServer
 
 	httpClient := &http.Client{
 		Transport: p.HttpRoundTripper,
