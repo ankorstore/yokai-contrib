@@ -24,26 +24,29 @@ that you can `inject` anywhere to interact with the [Slack API](https://api.slac
 
 This module requires [fxhttpclient](https://github.com/ankorstore/yokai/tree/main/fxhttpclient).
 
-First install the module:
+Install the modules:
 
 ```shell
+go get github.com/ankorstore/yokai/fxhttpclient
 go get github.com/ankorstore/yokai-contrib/fxslack
 ```
 
-Then activate it in your application bootstrapper:
+Then activate them in your application bootstrapper:
 
 ```go
 // internal/bootstrap.go
 package internal
 
 import (
-	"github.com/ankorstore/yokai/fxcore"
 	"github.com/ankorstore/yokai-contrib/fxslack"
+	"github.com/ankorstore/yokai/fxcore"
+	"github.com/ankorstore/yokai/fxhttpclient"
 )
 
 var Bootstrapper = fxcore.NewBootstrapper().WithOptions(
-	// load fxslack module
-	fxslack.FxSlackbModule,
+	// load modules
+	fxhttpclient.FxHttpClientModule,
+	fxslack.FxSlackModule,
 	// ...
 )
 ```
