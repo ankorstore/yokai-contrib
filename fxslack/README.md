@@ -12,7 +12,6 @@
 * [Overview](#overview)
 * [Installation](#installation)
 * [Configuration](#configuration)
-* [Health Check](#health-check)
 * [Testing](#testing)
 <!-- TOC -->
 
@@ -63,9 +62,11 @@ app:
 modules:
   slack:
     auth_token: ${SLACK_AUTH_TOKEN}  # Slack Auth Token
-	  app_level_token: ${SLACK_APP_LEVEL_TOKEN} # Slack App level Token
+    app_level_token: ${SLACK_APP_LEVEL_TOKEN} # Slack App level Token
 ```
 
 ## Testing
 
 In `test` mode, this client is configured to interact with a [fake slack server](https://github.com/slack-go/slack/tree/master/slacktest).
+
+See [example](module_test.go).
