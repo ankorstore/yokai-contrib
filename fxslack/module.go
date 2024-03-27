@@ -23,12 +23,14 @@ var FxSlackModule = fx.Module(
 	),
 )
 
+// FxSlackTestServerParam allows injection of the required dependencies in [NewSlackTestServer].
 type FxSlackTestServerParam struct {
 	fx.In
 	LifeCycle fx.Lifecycle
 	Config    *config.Config
 }
 
+// NewSlackTestServer returns a [slacktest.Server].
 func NewSlackTestServer(p FxSlackTestServerParam) *slacktest.Server {
 	if p.Config.IsTestEnv() {
 		return slacktest.NewTestServer()
@@ -37,6 +39,7 @@ func NewSlackTestServer(p FxSlackTestServerParam) *slacktest.Server {
 	return nil
 }
 
+// FxSlackClientParam allows injection of the required dependencies in [NewSlackClient].
 type FxSlackClientParam struct {
 	fx.In
 	LifeCycle        fx.Lifecycle
@@ -45,6 +48,7 @@ type FxSlackClientParam struct {
 	TestServer       *slacktest.Server
 }
 
+// NewSlackClient returns a [slack.Client].
 func NewSlackClient(p FxSlackClientParam) *slack.Client {
 	if p.Config.IsTestEnv() {
 		return createTestClient(p)
