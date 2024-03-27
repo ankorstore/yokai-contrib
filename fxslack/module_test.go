@@ -1,7 +1,6 @@
 package fxslack_test
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -40,25 +39,21 @@ func TestFxSlackClient(t *testing.T) {
 	var conf *config.Config
 	var client *slack.Client
 
-	var roundTripperProvide = func() http.RoundTripper {
-		return http.DefaultTransport
-	}
-
 	app := fxtest.New(
 		t,
 		fx.NopLogger,
 		fxconfig.FxConfigModule,
 		fxslack.FxSlackModule,
+		provideTestRoundTripper(),
 		fx.Populate(&conf, &client),
-		fx.Provide(roundTripperProvide),
 	)
 
-	err := app.Start(context.Background())
-	assert.NoError(t, err, "failed to create slack.Client")
+	app.RequireStart()
+	assert.NoError(t, app.Err(), "failed to create slack.Client")
 	assert.NotNil(t, client)
 
-	err = app.Stop(context.Background())
-	assert.NoError(t, err, "failed to close slack.Client")
+	app.RequireStop()
+	assert.NoError(t, app.Err(), "failed to close slack.Client")
 }
 
 func TestFxSlackTestClient(t *testing.T) {
@@ -69,25 +64,21 @@ func TestFxSlackTestClient(t *testing.T) {
 	var conf *config.Config
 	var client *slack.Client
 
-	var roundTripperProvide = func() http.RoundTripper {
-		return http.DefaultTransport
-	}
-
 	app := fxtest.New(
 		t,
 		fx.NopLogger,
 		fxconfig.FxConfigModule,
 		fxslack.FxSlackModule,
+		provideTestRoundTripper(),
 		fx.Populate(&conf, &client),
-		fx.Provide(roundTripperProvide),
 	)
 
-	err := app.Start(context.Background())
-	assert.NoError(t, err, "failed to create test slack.Client")
+	app.RequireStart()
+	assert.NoError(t, app.Err(), "failed to create test slack.Client")
 	assert.NotNil(t, client)
 
-	err = app.Stop(context.Background())
-	assert.NoError(t, err, "failed to close test slack.Client")
+	app.RequireStop()
+	assert.NoError(t, app.Err(), "failed to close test slack.Client")
 }
 
 func TestFxSlackTestServer(t *testing.T) {
@@ -98,25 +89,21 @@ func TestFxSlackTestServer(t *testing.T) {
 	var conf *config.Config
 	var server *slacktest.Server
 
-	var roundTripperProvide = func() http.RoundTripper {
-		return http.DefaultTransport
-	}
-
 	app := fxtest.New(
 		t,
 		fx.NopLogger,
 		fxconfig.FxConfigModule,
 		fxslack.FxSlackModule,
+		provideTestRoundTripper(),
 		fx.Populate(&conf, &server),
-		fx.Provide(roundTripperProvide),
 	)
 
-	err := app.Start(context.Background())
-	assert.NoError(t, err, "failed to create test slacktest.Server")
+	app.RequireStart()
+	assert.NoError(t, app.Err(), "failed to create test slacktest.Server")
 	assert.NotNil(t, server)
 
-	err = app.Stop(context.Background())
-	assert.NoError(t, err, "failed to close test slacktest.Server")
+	app.RequireStop()
+	assert.NoError(t, app.Err(), "failed to close test slacktest.Server")
 }
 
 func TestSlackClientWithTestServer(t *testing.T) {
@@ -128,24 +115,23 @@ func TestSlackClientWithTestServer(t *testing.T) {
 	var server *slacktest.Server
 	var client *slack.Client
 
-	var roundTripperProvide = func() http.RoundTripper {
-		return http.DefaultTransport
-	}
-
-	maxWait := 5 * time.Second
+	maxWait := 1 * time.Second
 
 	app := fxtest.New(
 		t,
 		fx.NopLogger,
 		fxconfig.FxConfigModule,
 		fxslack.FxSlackModule,
+		provideTestRoundTripper(),
 		fx.Populate(&conf, &server, &client),
-		fx.Provide(roundTripperProvide),
 	)
 
-	err := app.Start(context.Background())
-	assert.NoError(t, err, "failed to create test slacktest.Server")
+	app.RequireStart()
+	assert.NoError(t, app.Err(), "failed to create test slacktest.Server")
 	assert.NotNil(t, server)
+
+	server.Start()
+	defer server.Stop()
 
 	rtm := client.NewRTM()
 	go rtm.ManageConnection()
@@ -168,6 +154,17 @@ func TestSlackClientWithTestServer(t *testing.T) {
 
 	assert.True(t, server.SawMessage("should see this inbound message"))
 
-	err = app.Stop(context.Background())
-	assert.NoError(t, err, "failed to close test slacktest.Server")
+	app.RequireStop()
+	assert.NoError(t, app.Err(), "failed to close test slacktest.Server")
+}
+
+func provideTestRoundTripper() fx.Option {
+	return fx.Provide(
+		fx.Annotate(
+			func() http.RoundTripper {
+				return &http.Transport{}
+			},
+			fx.As(new(http.RoundTripper)),
+		),
+	)
 }

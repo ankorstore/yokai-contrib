@@ -1,7 +1,6 @@
 package fxslack
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/ankorstore/yokai/config"
@@ -19,10 +18,24 @@ const ModuleName = "slack"
 var FxSlackModule = fx.Module(
 	ModuleName,
 	fx.Provide(
-		NewSlackClient,
 		NewSlackTestServer,
+		NewSlackClient,
 	),
 )
+
+type FxSlackTestServerParam struct {
+	fx.In
+	LifeCycle fx.Lifecycle
+	Config    *config.Config
+}
+
+func NewSlackTestServer(p FxSlackTestServerParam) *slacktest.Server {
+	if p.Config.IsTestEnv() {
+		return slacktest.NewTestServer()
+	}
+
+	return nil
+}
 
 type FxSlackClientParam struct {
 	fx.In
@@ -38,35 +51,6 @@ func NewSlackClient(p FxSlackClientParam) *slack.Client {
 	} else {
 		return createClient(p)
 	}
-}
-
-type FxSlackTestServerParam struct {
-	fx.In
-	LifeCycle fx.Lifecycle
-	Config    *config.Config
-}
-
-func NewSlackTestServer(p FxSlackTestServerParam) *slacktest.Server {
-	if p.Config.IsTestEnv() {
-		server := slacktest.NewTestServer()
-
-		p.LifeCycle.Append(fx.Hook{
-			OnStart: func(context.Context) error {
-				go server.Start()
-
-				return nil
-			},
-			OnStop: func(context.Context) error {
-				server.Stop()
-
-				return nil
-			},
-		})
-
-		return server
-	}
-
-	return nil
 }
 
 func createClient(p FxSlackClientParam) *slack.Client {
