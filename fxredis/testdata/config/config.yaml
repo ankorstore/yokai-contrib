@@ -1,0 +1,5 @@
+app:
+  name: test-app
+modules:
+  redis:
+    dsn: redis://${REDIS_USER}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}

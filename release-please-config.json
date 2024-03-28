@@ -10,6 +10,11 @@
       "release-type": "go",
       "component": "fxslack",
       "tag-separator": "/"
+    },
+    "fxredis": {
+      "release-type": "go",
+      "component": "fxredis",
+      "tag-separator": "/"
     }
   }
 }
