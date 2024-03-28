@@ -16,7 +16,7 @@ const ModuleName = "redis"
 var FxRedisModule = fx.Module(
 	ModuleName,
 	fx.Provide(
-		NewRedisClient,
+		NewFxRedisClient,
 	),
 )
 
@@ -27,28 +27,27 @@ type FxRedisClientParam struct {
 	Config    *config.Config
 }
 
-// NewRedisClient returns a [redis.Client].
-func NewRedisClient(p FxRedisClientParam) (*redis.Client, *redismock.ClientMock) {
+// NewFxRedisClient returns a [redis.Client].
+func NewFxRedisClient(p FxRedisClientParam) (*redis.Client, *redismock.ClientMock, error) {
 	if p.Config.IsTestEnv() {
 		return createMockClient()
 	} else {
-		client := createClient(p)
-
-		return client, nil
+		client, err := createClient(p)
+		return client, nil, err
 	}
 }
 
-func createClient(p FxRedisClientParam) *redis.Client {
+func createClient(p FxRedisClientParam) (*redis.Client, error) {
 	opt, err := redis.ParseURL(p.Config.GetString("modules.redis.dsn"))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return redis.NewClient(opt)
+	return redis.NewClient(opt), nil
 }
 
-func createMockClient() (*redis.Client, *redismock.ClientMock) {
+func createMockClient() (*redis.Client, *redismock.ClientMock, error) {
 	client, clientMock := redismock.NewClientMock()
 
-	return client, &clientMock
+	return client, &clientMock, nil
 }

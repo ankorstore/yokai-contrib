@@ -26,7 +26,6 @@ Install the module:
 
 ```shell
 go get github.com/ankorstore/yokai-contrib/fxredis
-go get github.com/go-redis/redismock/v9
 ```
 
 Then activate them in your application bootstrapper:
@@ -38,7 +37,6 @@ package internal
 import (
 	"github.com/ankorstore/yokai-contrib/fxredis"
 	"github.com/ankorstore/yokai/fxcore"
-	"github.com/ankorstore/yokai/fxhttpclient"
 )
 
 var Bootstrapper = fxcore.NewBootstrapper().WithOptions(
