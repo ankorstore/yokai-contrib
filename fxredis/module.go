@@ -33,6 +33,7 @@ func NewFxRedisClient(p FxRedisClientParam) (*redis.Client, *redismock.ClientMoc
 		return createMockClient()
 	} else {
 		client, err := createClient(p)
+
 		return client, nil, err
 	}
 }
