@@ -41,7 +41,6 @@ import (
 
 var Bootstrapper = fxcore.NewBootstrapper().WithOptions(
 	// load modules
-	fxhttpclient.FxHttpClientModule,
 	fxredis.FxRedisModule,
 	// ...
 )
