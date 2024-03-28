@@ -1,6 +1,7 @@
 package fxredis_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/ankorstore/yokai-contrib/fxredis"
@@ -40,7 +41,7 @@ func TestFxRedisClient(t *testing.T) {
 
 	var conf *config.Config
 	var client *redis.Client
-	var mockClient *redismock.ClientMock
+	var mockClient redismock.ClientMock
 
 	app := fxtest.New(
 		t,
@@ -70,7 +71,7 @@ func TestFxRedisTestClient(t *testing.T) {
 
 	var conf *config.Config
 	var client *redis.Client
-	var mockClient *redismock.ClientMock
+	var mockClient redismock.ClientMock
 
 	app := fxtest.New(
 		t,
@@ -84,6 +85,16 @@ func TestFxRedisTestClient(t *testing.T) {
 	assert.NoError(t, app.Err(), "failed to create test redis.Client")
 	assert.NotNil(t, client)
 	assert.NotNil(t, mockClient)
+
+	mockClient.ExpectSet("key", "value", 0).SetVal("OK")
+	mockClient.ExpectGet("key2").SetVal("value2")
+
+	client.Set(context.Background(), "key", "value", 0)
+	assert.Equal(t, "value2", client.Get(context.Background(), "key2").Val())
+
+	if err := mockClient.ExpectationsWereMet(); err != nil {
+		t.Error(err)
+	}
 
 	app.RequireStop()
 	assert.NoError(t, app.Err(), "failed to close test redis.Client")

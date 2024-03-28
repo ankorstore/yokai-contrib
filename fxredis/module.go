@@ -28,7 +28,7 @@ type FxRedisClientParam struct {
 }
 
 // NewFxRedisClient returns a [redis.Client].
-func NewFxRedisClient(p FxRedisClientParam) (*redis.Client, *redismock.ClientMock, error) {
+func NewFxRedisClient(p FxRedisClientParam) (*redis.Client, redismock.ClientMock, error) {
 	if p.Config.IsTestEnv() {
 		return createMockClient()
 	} else {
@@ -47,8 +47,8 @@ func createClient(p FxRedisClientParam) (*redis.Client, error) {
 	return redis.NewClient(opt), nil
 }
 
-func createMockClient() (*redis.Client, *redismock.ClientMock, error) {
+func createMockClient() (*redis.Client, redismock.ClientMock, error) {
 	client, clientMock := redismock.NewClientMock()
 
-	return client, &clientMock, nil
+	return client, clientMock, nil
 }
