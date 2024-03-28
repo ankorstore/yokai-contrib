@@ -5,6 +5,11 @@
       "release-type": "go",
       "component": "fxgcppubsub",
       "tag-separator": "/"
+    },
+    "fxslack": {
+      "release-type": "go",
+      "component": "fxslack",
+      "tag-separator": "/"
     }
   }
 }
