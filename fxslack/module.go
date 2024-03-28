@@ -66,6 +66,7 @@ func createClient(p FxSlackClientParam) *slack.Client {
 		p.Config.GetString("modules.slack.auth_token"),
 		slack.OptionHTTPClient(httpClient),
 		slack.OptionAppLevelToken(p.Config.GetString("modules.slack.app_level_token")),
+		slack.OptionDebug(p.Config.AppDebug()),
 	)
 
 	return client
@@ -83,6 +84,7 @@ func createTestClient(p FxSlackClientParam) *slack.Client {
 		slack.OptionHTTPClient(httpClient),
 		slack.OptionAppLevelToken(p.Config.GetString("modules.slack.app_level_token")),
 		slack.OptionAPIURL(server.GetAPIURL()),
+		slack.OptionDebug(p.Config.AppDebug()),
 	)
 
 	return client
