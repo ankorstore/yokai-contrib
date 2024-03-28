@@ -23,6 +23,7 @@ jobs:
         module:
         - "fxgcppubsub"
         - "fxslack"
+        - "fxredis"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
