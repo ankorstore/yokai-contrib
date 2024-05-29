@@ -1,0 +1,21 @@
+app:
+  name: test-app
+modules:
+  log:
+    output: test
+  trace:
+    processor:
+      type: test
+  gomysqlserver:
+    config:
+      transport: ${SERVER_TRANSPORT}
+      socket: ${SERVER_SOCKET}
+      user: user
+      password: password
+      host: 127.0.0.1
+      port: ${SERVER_PORT}
+      database: db
+    log:
+      enabled: false
+    trace:
+      enabled: ${SERVER_TRACE_ENABLED}

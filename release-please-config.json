@@ -6,6 +6,11 @@
       "component": "fxgcppubsub",
       "tag-separator": "/"
     },
+    "fxgomysqlserver": {
+      "release-type": "go",
+      "component": "fxgomysqlserver",
+      "tag-separator": "/"
+    },
     "fxslack": {
       "release-type": "go",
       "component": "fxslack",
