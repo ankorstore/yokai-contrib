@@ -13,18 +13,18 @@ const (
 )
 
 // String returns a string representation of the [Transport].
-func (d Transport) String() string {
-	return string(d)
+func (t Transport) String() string {
+	return string(t)
 }
 
 // FetchTransport returns a [Transport] for a given name.
 func FetchTransport(name string) Transport {
 	//nolint:exhaustive
-	switch d := Transport(strings.ToLower(name)); d {
+	switch t := Transport(strings.ToLower(name)); t {
 	case TCPTransport,
 		SocketTransport,
 		MemoryTransport:
-		return d
+		return t
 	default:
 		return UnknownTransport
 	}
