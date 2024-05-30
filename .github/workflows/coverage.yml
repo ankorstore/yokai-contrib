@@ -27,13 +27,14 @@ jobs:
         - "fxredis"
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
       - name: Install Go
         uses: actions/setup-go@v5
         with:
           go-version: ${{ inputs.go_version }}
+          check-latest: true
       - name: Install dependencies for module ${{ matrix.module }}
         working-directory: ${{ matrix.module }}
         run: go mod download

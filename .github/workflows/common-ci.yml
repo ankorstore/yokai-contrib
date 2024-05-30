@@ -20,13 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
       - name: Install Go
         uses: actions/setup-go@v5
         with:
           go-version: ${{ inputs.go_version }}
+          check-latest: true
       - name: Clean cache
         working-directory: ${{ inputs.module }}
         run: go clean -modcache && go clean -testcache && go mod tidy
