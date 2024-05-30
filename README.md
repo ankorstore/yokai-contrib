@@ -8,11 +8,12 @@
 
 ## Modules
 
-| Module                     | Description                                               |
-|----------------------------|-----------------------------------------------------------|
-| [fxgcppubsub](fxgcppubsub) | Module for [GCP Pub/Sub](https://cloud.google.com/pubsub) |
-| [fxslack](fxslack) | Module for [Slack](https://api.slack.com/) |
-| [fxredis](fxredis) | Module for [Redis](https://redis.io/docs/connect/clients/go/) |
+| Module                             | Description                                                              |
+|------------------------------------|--------------------------------------------------------------------------|
+| [fxgcppubsub](fxgcppubsub)         | Module for [GCP Pub/Sub](https://cloud.google.com/pubsub)                |
+| [fxgomysqlserver](fxgomysqlserver) | Module for [Go Mysql Server](https://github.com/dolthub/go-mysql-server) |
+| [fxslack](fxslack)                 | Module for [Slack](https://api.slack.com/)                               |
+| [fxredis](fxredis)                 | Module for [Redis](https://redis.io/docs/connect/clients/go/)            |
 
 ## Contributing
 
