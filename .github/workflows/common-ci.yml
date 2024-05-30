@@ -26,7 +26,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ inputs.go_version }}
+          go-version: '${{ inputs.go_version }}'
           check-latest: true
       - name: Clean cache
         working-directory: ${{ inputs.module }}

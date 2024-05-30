@@ -33,7 +33,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ inputs.go_version }}
+          go-version: '${{ inputs.go_version }}'
           check-latest: true
       - name: Install dependencies for module ${{ matrix.module }}
         working-directory: ${{ matrix.module }}
