@@ -64,6 +64,9 @@ func TestFxGoMySQLServerModule(t *testing.T) {
 			t.Errorf("expected to find tcp, but got %s", tableName)
 		}
 
+		err = db.Close()
+		assert.NoError(t, err)
+
 		app.RequireStop()
 		assert.NoError(t, app.Err())
 	})
@@ -106,6 +109,9 @@ func TestFxGoMySQLServerModule(t *testing.T) {
 			t.Errorf("expected to find socket, but got %s", tableName)
 		}
 
+		err = db.Close()
+		assert.NoError(t, err)
+
 		app.RequireStop()
 		assert.NoError(t, app.Err())
 	})
@@ -146,6 +152,9 @@ func TestFxGoMySQLServerModule(t *testing.T) {
 		if tableName != "memory" {
 			t.Errorf("expected to find memory, but got %s", tableName)
 		}
+
+		err = db.Close()
+		assert.NoError(t, err)
 
 		app.RequireStop()
 		assert.NoError(t, app.Err())
@@ -204,6 +213,9 @@ func TestFxGoMySQLServerModule(t *testing.T) {
 		if tableName != "memory" {
 			t.Errorf("expected to find memory, but got %s", tableName)
 		}
+
+		err = db.Close()
+		assert.NoError(t, err)
 
 		app.RequireStop()
 		assert.NoError(t, app.Err())
