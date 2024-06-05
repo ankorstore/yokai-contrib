@@ -2,6 +2,7 @@ package schema
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"cloud.google.com/go/pubsub"
@@ -30,6 +31,7 @@ func (r *SchemaRegistry) Get(ctx context.Context, schemaID string) (*pubsub.Sche
 
 	schema, err := r.client.Schema(ctx, schemaID, pubsub.SchemaViewFull)
 	if err != nil {
+		fmt.Printf("error: %s\n", err)
 		return nil, err
 	}
 
