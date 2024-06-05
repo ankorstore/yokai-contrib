@@ -6,6 +6,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/pubsub/pstest"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/schema"
 	"github.com/ankorstore/yokai/config"
 	"go.uber.org/fx"
 	"google.golang.org/api/option"
@@ -23,6 +24,8 @@ var FxGcpPubSubModule = fx.Module(
 	ModuleName,
 	fx.Provide(
 		NewFxGcpPubSubClient,
+		NewFxGcpPubSubSchemaClient,
+		schema.NewSchemaRegistry,
 	),
 )
 
@@ -30,6 +33,7 @@ var FxGcpPubSubModule = fx.Module(
 type FxGcpPubSubClientParam struct {
 	fx.In
 	LifeCycle fx.Lifecycle
+	Context   context.Context
 	Config    *config.Config
 }
 
@@ -43,7 +47,7 @@ func NewFxGcpPubSubClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 }
 
 func createClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
-	client, err := pubsub.NewClient(context.Background(), p.Config.GetString("modules.gcppubsub.project.id"))
+	client, err := pubsub.NewClient(p.Context, p.Config.GetString("modules.gcppubsub.project.id"))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pubsub client: %w", err)
 	}
@@ -66,7 +70,7 @@ func createTestClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 	}
 
 	client, err := pubsub.NewClient(
-		context.Background(),
+		p.Context,
 		p.Config.GetString("modules.gcppubsub.project.id"),
 		option.WithGRPCConn(conn),
 	)
@@ -86,4 +90,17 @@ func createTestClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 	})
 
 	return client, nil
+}
+
+// FxGcpPubSubSchemaClientParam allows injection of the required dependencies in [NewFxGcpPubSubSchemaClient].
+type FxGcpPubSubSchemaClientParam struct {
+	fx.In
+	Context context.Context
+	Config  *config.Config
+}
+
+// NewFxGcpPubSubSchemaClient returns a [pubsub.SchemaClient].
+func NewFxGcpPubSubSchemaClient(p FxGcpPubSubSchemaClientParam) (*pubsub.SchemaClient, error) {
+	return pubsub.NewSchemaClient(p.Context, p.Config.GetString("modules.gcppubsub.project.id"))
+
 }
