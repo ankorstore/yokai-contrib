@@ -25,7 +25,7 @@ var FxGcpPubSubModule = fx.Module(
 	fx.Provide(
 		NewFxGcpPubSubClient,
 		NewFxGcpPubSubSchemaClient,
-		schema.NewSchemaRegistry,
+		NewFxGcpPubSubSchemaRegistry,
 	),
 )
 
@@ -53,7 +53,7 @@ func createClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 	}
 
 	p.LifeCycle.Append(fx.Hook{
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(context.Context) error {
 			return client.Close()
 		},
 	})
@@ -79,7 +79,7 @@ func createTestClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 	}
 
 	p.LifeCycle.Append(fx.Hook{
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(context.Context) error {
 			err = client.Close()
 			if err != nil {
 				return err
@@ -102,5 +102,17 @@ type FxGcpPubSubSchemaClientParam struct {
 // NewFxGcpPubSubSchemaClient returns a [pubsub.SchemaClient].
 func NewFxGcpPubSubSchemaClient(p FxGcpPubSubSchemaClientParam) (*pubsub.SchemaClient, error) {
 	return pubsub.NewSchemaClient(p.Context, p.Config.GetString("modules.gcppubsub.project.id"))
+
+}
+
+// FxGcpPubSubSchemaRegistryParam allows injection of the required dependencies in [NewFxGcpPubSubSchemaRegistry].
+type FxGcpPubSubSchemaRegistryParam struct {
+	fx.In
+	Client *pubsub.SchemaClient
+}
+
+// NewFxGcpPubSubSchemaRegistry returns a [schema.SchemaRegistry].
+func NewFxGcpPubSubSchemaRegistry(p FxGcpPubSubSchemaRegistryParam) *schema.SchemaRegistry {
+	return schema.NewSchemaRegistry(p.Client)
 
 }
