@@ -6,7 +6,6 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/pubsub/pstest"
-	"github.com/ankorstore/yokai-contrib/fxgcppubsub/schema"
 	"github.com/ankorstore/yokai/config"
 	"go.uber.org/fx"
 	"google.golang.org/api/option"
@@ -25,7 +24,6 @@ var FxGcpPubSubModule = fx.Module(
 	fx.Provide(
 		NewFxGcpPubSubClient,
 		NewFxGcpPubSubSchemaClient,
-		NewFxGcpPubSubSchemaRegistry,
 	),
 )
 
@@ -102,17 +100,5 @@ type FxGcpPubSubSchemaClientParam struct {
 // NewFxGcpPubSubSchemaClient returns a [pubsub.SchemaClient].
 func NewFxGcpPubSubSchemaClient(p FxGcpPubSubSchemaClientParam) (*pubsub.SchemaClient, error) {
 	return pubsub.NewSchemaClient(p.Context, p.Config.GetString("modules.gcppubsub.project.id"))
-
-}
-
-// FxGcpPubSubSchemaRegistryParam allows injection of the required dependencies in [NewFxGcpPubSubSchemaRegistry].
-type FxGcpPubSubSchemaRegistryParam struct {
-	fx.In
-	Client *pubsub.SchemaClient
-}
-
-// NewFxGcpPubSubSchemaRegistry returns a [schema.SchemaRegistry].
-func NewFxGcpPubSubSchemaRegistry(p FxGcpPubSubSchemaRegistryParam) *schema.SchemaRegistry {
-	return schema.NewSchemaRegistry(p.Client)
 
 }
