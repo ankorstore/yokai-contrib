@@ -14,7 +14,6 @@ func DefaultPublishOptions() Options {
 	return Options{
 		Settings: pubsub.DefaultPublishSettings,
 	}
-
 }
 
 type PublishOption func(o *Options)

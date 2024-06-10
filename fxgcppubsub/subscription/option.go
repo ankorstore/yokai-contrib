@@ -14,7 +14,6 @@ func DefaultSubscribeOptions() Options {
 	return Options{
 		Settings: pubsub.DefaultReceiveSettings,
 	}
-
 }
 
 type SubscribeOption func(o *Options)

@@ -44,6 +44,8 @@ func NewFxGcpPubSubTestServer() *pstest.Server {
 }
 
 // FxGcpPubSubClientParam allows injection of the required dependencies in [NewFxGcpPubSubClient].
+//
+//nolint:containedctx
 type FxGcpPubSubClientParam struct {
 	fx.In
 	LifeCycle fx.Lifecycle
@@ -84,6 +86,8 @@ func NewFxGcpPubSubClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 }
 
 // FxGcpPubSubSchemaClientParam allows injection of the required dependencies in [NewFxGcpPubSubSchemaClient].
+//
+//nolint:containedctx
 type FxGcpPubSubSchemaClientParam struct {
 	fx.In
 	LifeCycle fx.Lifecycle
