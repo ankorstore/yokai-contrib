@@ -12,6 +12,7 @@ import (
 	"github.com/ankorstore/yokai/config"
 	"go.uber.org/fx"
 	"google.golang.org/api/option"
+	"google.golang.org/api/option/internaloption"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -113,7 +114,18 @@ func NewFxGcpPubSubSchemaClient(p FxGcpPubSubSchemaClientParam) (*pubsub.SchemaC
 		return client, nil
 	}
 
-	client, err := pubsub.NewSchemaClient(p.Context, p.Config.GetString("modules.gcppubsub.project.id"))
+	var schemaClientOptions []option.ClientOption
+	if emulatorHost := p.Config.GetEnvVar("PUBSUB_EMULATOR_HOST"); emulatorHost != "" {
+		schemaClientOptions = []option.ClientOption{
+			option.WithEndpoint(emulatorHost),
+			option.WithoutAuthentication(),
+			option.WithTelemetryDisabled(),
+			internaloption.SkipDialSettingsValidation(),
+			option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())),
+		}
+	}
+
+	client, err := pubsub.NewSchemaClient(p.Context, p.Config.GetString("modules.gcppubsub.project.id"), schemaClientOptions...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pubsub schema client: %w", err)
 	}
