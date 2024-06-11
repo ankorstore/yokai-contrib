@@ -125,7 +125,7 @@ func NewFxGcpPubSubSchemaClient(p FxGcpPubSubSchemaClientParam) (*pubsub.SchemaC
 		}
 	}
 
-	client, err := pubsub.NewSchemaClient(p.Context, p.Config.GetString("modules.gcppubsub.project.id"), schemaClientOptions...)
+	client, err := pubsub.NewSchemaClient(context.Background(), p.Config.GetString("modules.gcppubsub.project.id"), schemaClientOptions...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pubsub schema client: %w", err)
 	}
