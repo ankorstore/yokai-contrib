@@ -29,10 +29,11 @@ func TestNormalizeSchemaID(t *testing.T) {
 	}
 
 	for tn, tc := range tcs {
+		tlc := tc
 		t.Run(tn, func(t *testing.T) {
 			t.Parallel()
 
-			assert.Equal(t, tc.expectedOut, schema.NormalizeSchemaID(tc.in))
+			assert.Equal(t, tlc.expectedOut, schema.NormalizeSchemaID(tlc.in))
 		})
 	}
 }
