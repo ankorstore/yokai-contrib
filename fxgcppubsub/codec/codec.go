@@ -6,96 +6,93 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/hamba/avro/v2"
+	"github.com/linkedin/goavro/v2"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
-type Codec struct {
-	schemaConfig   *pubsub.SchemaConfig
-	schemaSettings *pubsub.SchemaSettings
+var _ Codec = (*DefaultCodec)(nil)
+
+// Codec is the interface for components in charge to handle raw, avro or protobuf encoding and decoding.
+type Codec interface {
+	Encode(in any) ([]byte, error)
+	Decode(enc []byte, out any) error
 }
 
-func NewCodec(schemaConfig *pubsub.SchemaConfig, schemaSettings *pubsub.SchemaSettings) *Codec {
-	return &Codec{
-		schemaConfig:   schemaConfig,
-		schemaSettings: schemaSettings,
+// DefaultCodec is the default Codec implementation.
+type DefaultCodec struct {
+	schemaType       pubsub.SchemaType
+	schemaEncoding   pubsub.SchemaEncoding
+	schemaDefinition string
+}
+
+// NewDefaultCodec returns a new DefaultCodec instance.
+func NewDefaultCodec(schemaType pubsub.SchemaType, schemaEncoding pubsub.SchemaEncoding, schemaDefinition string) *DefaultCodec {
+	return &DefaultCodec{
+		schemaType:       schemaType,
+		schemaEncoding:   schemaEncoding,
+		schemaDefinition: schemaDefinition,
 	}
 }
 
-func (c *Codec) Encode(in any) ([]byte, error) {
-	if c.schemaConfig == nil || c.schemaSettings == nil {
-		inBytes, ok := in.([]byte)
-		if !ok {
-			return nil, fmt.Errorf("data without schema must be of type []byte")
-		}
-
-		return inBytes, nil
-	}
-
-	var out []byte
-	var err error
-
-	switch c.schemaConfig.Type {
+// Encode encodes an input into an avro or protobuf encoded slice of bytes.
+func (c *DefaultCodec) Encode(in any) ([]byte, error) {
+	switch c.schemaType {
+	case pubsub.SchemaTypeUnspecified:
+		return []byte(fmt.Sprintf("%s", in)), nil
 	case pubsub.SchemaAvro:
-		switch c.schemaSettings.Encoding {
+		switch c.schemaEncoding {
 		case pubsub.EncodingBinary:
-			out, err = c.encodeAvroBinary(in)
+			return c.encodeAvroBinary(in)
 		case pubsub.EncodingJSON:
-			out, err = c.encodeAvroJSON(in)
+			return c.encodeAvroJSON(in)
 		default:
-			err = fmt.Errorf("invalid avro encoding")
+			return nil, fmt.Errorf("invalid avro encoding")
 		}
 	case pubsub.SchemaProtocolBuffer:
-		switch c.schemaSettings.Encoding {
+		switch c.schemaEncoding {
 		case pubsub.EncodingBinary:
-			out, err = c.encodeProtoBinary(in)
+			return c.encodeProtoBinary(in)
 		case pubsub.EncodingJSON:
-			out, err = c.encodeProtoJSON(in)
+			return c.encodeProtoJSON(in)
 		default:
-			err = fmt.Errorf("invalid proto encoding")
+			return nil, fmt.Errorf("invalid proto encoding")
 		}
 	default:
-		err = fmt.Errorf("invalid schema type")
+		return nil, fmt.Errorf("invalid schema type")
 	}
-
-	return out, err
 }
 
-func (c *Codec) Decode(enc []byte, out any) error {
-	if c.schemaConfig == nil || c.schemaSettings == nil {
-		return fmt.Errorf("no schema associated, nothing to decode, use message data instead")
-	}
-
-	var err error
-
-	switch c.schemaConfig.Type {
+// Decode decodes an avro or protobuf encoded slice of bytes into a provided output.
+func (c *DefaultCodec) Decode(enc []byte, out any) error {
+	switch c.schemaType {
+	case pubsub.SchemaTypeUnspecified:
+		return fmt.Errorf("data without schema cannot be decoded")
 	case pubsub.SchemaAvro:
-		switch c.schemaSettings.Encoding {
+		switch c.schemaEncoding {
 		case pubsub.EncodingBinary:
-			err = c.decodeAvroBinary(enc, out)
+			return c.decodeAvroBinary(enc, out)
 		case pubsub.EncodingJSON:
-			err = c.decodeAvroJSON(enc, out)
+			return c.decodeAvroJSON(enc, out)
 		default:
-			err = fmt.Errorf("invalid avro encoding")
+			return fmt.Errorf("invalid avro encoding")
 		}
 	case pubsub.SchemaProtocolBuffer:
-		switch c.schemaSettings.Encoding {
+		switch c.schemaEncoding {
 		case pubsub.EncodingBinary:
-			err = c.decodeProtoBinary(enc, out)
+			return c.decodeProtoBinary(enc, out)
 		case pubsub.EncodingJSON:
-			err = c.decodeProtoJSON(enc, out)
+			return c.decodeProtoJSON(enc, out)
 		default:
-			err = fmt.Errorf("invalid proto encoding")
+			return fmt.Errorf("invalid proto encoding")
 		}
 	default:
-		err = fmt.Errorf("invalid schema type")
+		return fmt.Errorf("invalid schema type")
 	}
-
-	return err
 }
 
-func (c *Codec) encodeAvroBinary(in any) ([]byte, error) {
-	avroSchema, err := avro.Parse(c.schemaConfig.Definition)
+func (c *DefaultCodec) encodeAvroBinary(in any) ([]byte, error) {
+	avroSchema, err := avro.Parse(c.schemaDefinition)
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse avro schema: %w", err)
 	}
@@ -108,8 +105,8 @@ func (c *Codec) encodeAvroBinary(in any) ([]byte, error) {
 	return out, nil
 }
 
-func (c *Codec) decodeAvroBinary(enc []byte, out any) error {
-	avroSchema, err := avro.Parse(c.schemaConfig.Definition)
+func (c *DefaultCodec) decodeAvroBinary(enc []byte, out any) error {
+	avroSchema, err := avro.Parse(c.schemaDefinition)
 	if err != nil {
 		return fmt.Errorf("cannot parse avro schema: %w", err)
 	}
@@ -122,8 +119,18 @@ func (c *Codec) decodeAvroBinary(enc []byte, out any) error {
 	return nil
 }
 
-func (c *Codec) encodeAvroJSON(in any) ([]byte, error) {
-	out, err := json.Marshal(in)
+func (c *DefaultCodec) encodeAvroJSON(in any) ([]byte, error) {
+	avroSchema, err := goavro.NewCodec(c.schemaDefinition)
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse avro schema: %w", err)
+	}
+
+	inMap, err := c.convertStructIntoMap(in)
+	if err != nil {
+		return nil, fmt.Errorf("cannot convert struct into map: %w", err)
+	}
+
+	out, err := avroSchema.TextualFromNative(nil, inMap)
 	if err != nil {
 		return nil, fmt.Errorf("cannot encode avro json: %w", err)
 	}
@@ -131,16 +138,31 @@ func (c *Codec) encodeAvroJSON(in any) ([]byte, error) {
 	return out, nil
 }
 
-func (c *Codec) decodeAvroJSON(enc []byte, out any) error {
-	err := json.Unmarshal(enc, out)
+func (c *DefaultCodec) decodeAvroJSON(enc []byte, out any) error {
+	avroSchema, err := goavro.NewCodec(c.schemaDefinition)
+	if err != nil {
+		return fmt.Errorf("cannot parse avro schema: %w", err)
+	}
+
+	data, _, err := avroSchema.NativeFromTextual(enc)
 	if err != nil {
 		return fmt.Errorf("cannot decode avro json: %w", err)
+	}
+
+	dataMap, ok := data.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("cannot convert avro json into map: %w", err)
+	}
+
+	err = c.convertMapIntoStruct(dataMap, out)
+	if err != nil {
+		return fmt.Errorf("cannot convert map into struct: %w", err)
 	}
 
 	return nil
 }
 
-func (c *Codec) encodeProtoBinary(in any) ([]byte, error) {
+func (c *DefaultCodec) encodeProtoBinary(in any) ([]byte, error) {
 	protoIn, ok := in.(proto.Message)
 	if !ok {
 		return nil, fmt.Errorf("invalid proto message")
@@ -154,7 +176,7 @@ func (c *Codec) encodeProtoBinary(in any) ([]byte, error) {
 	return out, nil
 }
 
-func (c *Codec) decodeProtoBinary(enc []byte, out any) error {
+func (c *DefaultCodec) decodeProtoBinary(enc []byte, out any) error {
 	protoOut, ok := out.(proto.Message)
 	if !ok {
 		return fmt.Errorf("invalid proto message")
@@ -168,7 +190,7 @@ func (c *Codec) decodeProtoBinary(enc []byte, out any) error {
 	return nil
 }
 
-func (c *Codec) encodeProtoJSON(in any) ([]byte, error) {
+func (c *DefaultCodec) encodeProtoJSON(in any) ([]byte, error) {
 	protoIn, ok := in.(proto.Message)
 	if !ok {
 		return nil, fmt.Errorf("invalid proto message")
@@ -182,7 +204,7 @@ func (c *Codec) encodeProtoJSON(in any) ([]byte, error) {
 	return out, nil
 }
 
-func (c *Codec) decodeProtoJSON(enc []byte, out any) error {
+func (c *DefaultCodec) decodeProtoJSON(enc []byte, out any) error {
 	protoOut, ok := out.(proto.Message)
 	if !ok {
 		return fmt.Errorf("invalid proto message")
@@ -191,6 +213,36 @@ func (c *Codec) decodeProtoJSON(enc []byte, out any) error {
 	err := protojson.Unmarshal(enc, protoOut)
 	if err != nil {
 		return fmt.Errorf("cannot decode proto json: %w", err)
+	}
+
+	return nil
+}
+
+func (c *DefaultCodec) convertStructIntoMap(in any) (map[string]interface{}, error) {
+	var out map[string]interface{}
+
+	jsonIn, err := json.Marshal(in)
+	if err != nil {
+		return nil, fmt.Errorf("cannot marshal json: %w", err)
+	}
+
+	err = json.Unmarshal(jsonIn, &out)
+	if err != nil {
+		return nil, fmt.Errorf("cannot unmarshal json: %w", err)
+	}
+
+	return out, nil
+}
+
+func (c *DefaultCodec) convertMapIntoStruct(in map[string]interface{}, out any) error {
+	jsonIn, err := json.Marshal(in)
+	if err != nil {
+		return fmt.Errorf("cannot marshal json: %w", err)
+	}
+
+	err = json.Unmarshal(jsonIn, &out)
+	if err != nil {
+		return fmt.Errorf("cannot unmarshal json: %w", err)
 	}
 
 	return nil

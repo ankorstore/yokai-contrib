@@ -8,41 +8,52 @@ import (
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/topic"
 )
 
-type Publisher struct {
-	factory  *topic.TopicFactory
-	registry *topic.TopicRegistry
+var _ Publisher = (*DefaultPublisher)(nil)
+
+// Publisher is the interface for high level publishers.
+type Publisher interface {
+	Publish(ctx context.Context, topicID string, data any, options ...topic.PublishOption) (*pubsub.PublishResult, error)
+	Stop()
 }
 
-func NewPublisher(factory *topic.TopicFactory, registry *topic.TopicRegistry) *Publisher {
-	return &Publisher{
+// DefaultPublisher is the default Publisher implementation.
+type DefaultPublisher struct {
+	factory  topic.TopicFactory
+	registry topic.TopicRegistry
+}
+
+// NewDefaultPublisher returns a new DefaultPublisher instance.
+func NewDefaultPublisher(factory topic.TopicFactory, registry topic.TopicRegistry) *DefaultPublisher {
+	return &DefaultPublisher{
 		factory:  factory,
 		registry: registry,
 	}
 }
 
-func (p *Publisher) Publish(ctx context.Context, topicID string, data any, options ...topic.PublishOption) (*pubsub.PublishResult, error) {
-	// get topic
+// Publish publishes data, with options, on a given topicID.
+func (p *DefaultPublisher) Publish(ctx context.Context, topicID string, data any, options ...topic.PublishOption) (*pubsub.PublishResult, error) {
+	// retrieve topic
 	if !p.registry.Has(topicID) {
-		topic, err := p.factory.Create(ctx, topicID)
+		top, err := p.factory.Create(ctx, topicID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("cannot create topic: %w", err)
 		}
 
-		p.registry.Add(topic)
+		p.registry.Add(top)
 	}
 
-	topic, err := p.registry.Get(topicID)
+	top, err := p.registry.Get(topicID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get topic: %w", err)
 	}
 
 	// publish
-	return topic.WithOptions(options...).Publish(ctx, data)
+	return top.WithOptions(options...).Publish(ctx, data)
 }
 
-func (p *Publisher) Stop() {
-	// graceful stop
-	for _, topic := range p.registry.All() {
-		topic.Base().Stop()
+// Stop stops gracefully all internal publishers.
+func (p *DefaultPublisher) Stop() {
+	for _, top := range p.registry.All() {
+		top.BaseTopic().Stop()
 	}
 }

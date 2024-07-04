@@ -5,18 +5,31 @@ import (
 	"sync"
 )
 
-type TopicRegistry struct {
+var _ TopicRegistry = (*DefaultTopicRegistry)(nil)
+
+// TopicRegistry is the interface for Topic registries.
+type TopicRegistry interface {
+	Has(topicID string) bool
+	Get(topicID string) (*Topic, error)
+	Add(topic *Topic)
+	All() map[string]*Topic
+}
+
+// DefaultTopicRegistry is the default TopicRegistry implementation.
+type DefaultTopicRegistry struct {
 	topics map[string]*Topic
 	mutex  sync.RWMutex
 }
 
-func NewTopicRegistry() *TopicRegistry {
-	return &TopicRegistry{
+// NewDefaultTopicRegistry returns a new DefaultTopicRegistry instance.
+func NewDefaultTopicRegistry() *DefaultTopicRegistry {
+	return &DefaultTopicRegistry{
 		topics: make(map[string]*Topic),
 	}
 }
 
-func (r *TopicRegistry) Has(topicID string) bool {
+// Has returns true if the registry contains a Topic for the provided topicID.
+func (r *DefaultTopicRegistry) Has(topicID string) bool {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -25,16 +38,8 @@ func (r *TopicRegistry) Has(topicID string) bool {
 	return found
 }
 
-func (r *TopicRegistry) Add(topic *Topic) *TopicRegistry {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
-	r.topics[topic.Base().ID()] = topic
-
-	return r
-}
-
-func (r *TopicRegistry) Get(topicID string) (*Topic, error) {
+// Get returns a registered Topic for the provided topicID.
+func (r *DefaultTopicRegistry) Get(topicID string) (*Topic, error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -45,6 +50,18 @@ func (r *TopicRegistry) Get(topicID string) (*Topic, error) {
 	return nil, fmt.Errorf("cannot find topic %s", topicID)
 }
 
-func (r *TopicRegistry) All() map[string]*Topic {
+// Add registers a Topic.
+func (r *DefaultTopicRegistry) Add(topic *Topic) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	r.topics[topic.BaseTopic().ID()] = topic
+}
+
+// All returns all registered Topic.
+func (r *DefaultTopicRegistry) All() map[string]*Topic {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	return r.topics
 }

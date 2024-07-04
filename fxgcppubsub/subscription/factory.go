@@ -9,19 +9,31 @@ import (
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/schema"
 )
 
-type SubscriptionFactory struct {
-	client   *pubsub.Client
-	registry *schema.SchemaRegistry
+var _ SubscriptionFactory = (*DefaultSubscriptionFactory)(nil)
+
+// SubscriptionFactory is the interface for Subscription factories.
+type SubscriptionFactory interface {
+	Create(ctx context.Context, subscriptionID string) (*Subscription, error)
 }
 
-func NewSubscriptionFactory(client *pubsub.Client, registry *schema.SchemaRegistry) *SubscriptionFactory {
-	return &SubscriptionFactory{
+// DefaultSubscriptionFactory is the default SubscriptionFactory implementation.
+type DefaultSubscriptionFactory struct {
+	client   *pubsub.Client
+	registry schema.SchemaConfigRegistry
+	factory  codec.CodecFactory
+}
+
+// NewDefaultSubscriptionFactory returns a new DefaultSubscriptionFactory instance.
+func NewDefaultSubscriptionFactory(client *pubsub.Client, registry schema.SchemaConfigRegistry, factory codec.CodecFactory) *DefaultSubscriptionFactory {
+	return &DefaultSubscriptionFactory{
 		client:   client,
 		registry: registry,
+		factory:  factory,
 	}
 }
 
-func (f *SubscriptionFactory) Create(ctx context.Context, subscriptionID string) (*Subscription, error) {
+// Create creates a new Subscription.
+func (f *DefaultSubscriptionFactory) Create(ctx context.Context, subscriptionID string) (*Subscription, error) {
 	// subscription
 	subscription := f.client.Subscription(subscriptionID)
 
@@ -31,28 +43,30 @@ func (f *SubscriptionFactory) Create(ctx context.Context, subscriptionID string)
 		return nil, fmt.Errorf("cannot get subscription configuration: %w", err)
 	}
 
-	// topic config
+	// subscription topic config
 	topicConfig, err := subscriptionConfig.Topic.Config(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get subscription topic configuration: %w", err)
 	}
 
-	// topic schema settings
-	topicSchemaSettings := topicConfig.SchemaSettings
+	// subscription topic schema config
+	topicSchemaType := pubsub.SchemaTypeUnspecified
+	topicSchemaEncoding := pubsub.EncodingUnspecified
+	topicSchemaDefinition := ""
 
-	// topic schema config
-	var topicSchemaConfig *pubsub.SchemaConfig
-	if topicSchemaSettings != nil {
-		// schema config
-		topicSchemaConfig, err = f.registry.Get(ctx, topicSchemaSettings.Schema)
+	if topicConfig.SchemaSettings != nil {
+		topicSchemaConfig, err := f.registry.Get(ctx, topicConfig.SchemaSettings.Schema)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("cannot get subscription topic schema configuration: %w", err)
 		}
+
+		topicSchemaType = topicSchemaConfig.Type
+		topicSchemaEncoding = topicConfig.SchemaSettings.Encoding
+		topicSchemaDefinition = topicSchemaConfig.Definition
 	}
 
-	// codec
-	topicCodec := codec.NewCodec(topicSchemaConfig, topicSchemaSettings)
-
-	// create
-	return NewSubscription(subscription, topicCodec), nil
+	return NewSubscription(
+		f.factory.Create(topicSchemaType, topicSchemaEncoding, topicSchemaDefinition),
+		subscription,
+	), nil
 }

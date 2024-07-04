@@ -6,6 +6,9 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/pubsub/pstest"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/codec"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor/ack"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/schema"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/subscription"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/topic"
@@ -26,22 +29,69 @@ const ModuleName = "gcppubsub"
 var FxGcpPubSubModule = fx.Module(
 	ModuleName,
 	fx.Provide(
-		schema.NewSchemaRegistry,
-		topic.NewTopicFactory,
-		topic.NewTopicRegistry,
-		subscription.NewSubscriptionFactory,
-		subscription.NewSubscriptionRegistry,
+		NewFxGcpPubSubTestServerWaiterSupervisor,
 		NewFxGcpPubSubTestServer,
 		NewFxGcpPubSubClient,
 		NewFxGcpPubSubSchemaClient,
-		NewFxGcpPubSubPublisher,
-		NewFxGcpPubSubSubscriber,
+		fx.Annotate(
+			codec.NewDefaultCodecFactory,
+			fx.As(new(codec.CodecFactory)),
+		),
+		fx.Annotate(
+			schema.NewDefaultSchemaConfigRegistry,
+			fx.As(new(schema.SchemaConfigRegistry)),
+		),
+		fx.Annotate(
+			topic.NewDefaultTopicFactory,
+			fx.As(new(topic.TopicFactory)),
+		),
+		fx.Annotate(
+			topic.NewDefaultTopicRegistry,
+			fx.As(new(topic.TopicRegistry)),
+		),
+		fx.Annotate(
+			subscription.NewDefaultSubscriptionFactory,
+			fx.As(new(subscription.SubscriptionFactory)),
+		),
+		fx.Annotate(
+			subscription.NewDefaultSubscriptionRegistry,
+			fx.As(new(subscription.SubscriptionRegistry)),
+		),
+		fx.Annotate(
+			NewFxGcpPubSubPublisher,
+			fx.As(new(Publisher)),
+		),
+		fx.Annotate(
+			NewFxGcpPubSubSubscriber,
+			fx.As(new(Subscriber)),
+		),
 	),
+	AsPubSubTestServerReactor(ack.NewAckReactor),
 )
 
+func NewFxGcpPubSubTestServerWaiterSupervisor() *reactor.WaiterSupervisor {
+	return reactor.NewWaiterSupervisor()
+}
+
+type FxGcpPubSubTestServerParam struct {
+	fx.In
+	Reactors []Reactor `group:"gcppubsub-reactors"`
+}
+
 // NewFxGcpPubSubTestServer returns a [pstest.Server].
-func NewFxGcpPubSubTestServer() *pstest.Server {
-	return pstest.NewServer()
+func NewFxGcpPubSubTestServer(p FxGcpPubSubTestServerParam) *pstest.Server {
+	options := []pstest.ServerReactorOption{}
+
+	for _, r := range p.Reactors {
+		for _, fn := range r.FuncNames() {
+			options = append(options, pstest.ServerReactorOption{
+				FuncName: fn,
+				Reactor:  r,
+			})
+		}
+	}
+
+	return pstest.NewServer(options...)
 }
 
 // FxGcpPubSubClientParam allows injection of the required dependencies in [NewFxGcpPubSubClient].
@@ -57,10 +107,12 @@ type FxGcpPubSubClientParam struct {
 
 // NewFxGcpPubSubClient returns a [pubsub.Client].
 func NewFxGcpPubSubClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
+	projectID := p.Config.GetString("modules.gcppubsub.project.id")
+
 	if p.Config.IsTestEnv() {
 		client, err := pubsub.NewClient(
-			context.Background(),
-			p.Config.GetString("modules.gcppubsub.project.id"),
+			p.Context,
+			projectID,
 			option.WithEndpoint(p.Server.Addr),
 			option.WithoutAuthentication(),
 			option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())),
@@ -72,7 +124,7 @@ func NewFxGcpPubSubClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 		return client, nil
 	}
 
-	client, err := pubsub.NewClient(p.Context, p.Config.GetString("modules.gcppubsub.project.id"))
+	client, err := pubsub.NewClient(p.Context, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pubsub client: %w", err)
 	}
@@ -99,10 +151,12 @@ type FxGcpPubSubSchemaClientParam struct {
 
 // NewFxGcpPubSubSchemaClient returns a [pubsub.SchemaClient].
 func NewFxGcpPubSubSchemaClient(p FxGcpPubSubSchemaClientParam) (*pubsub.SchemaClient, error) {
+	projectID := p.Config.GetString("modules.gcppubsub.project.id")
+
 	if p.Config.IsTestEnv() {
 		client, err := pubsub.NewSchemaClient(
-			context.Background(),
-			p.Config.GetString("modules.gcppubsub.project.id"),
+			p.Context,
+			projectID,
 			option.WithEndpoint(p.Server.Addr),
 			option.WithoutAuthentication(),
 			option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())),
@@ -125,7 +179,7 @@ func NewFxGcpPubSubSchemaClient(p FxGcpPubSubSchemaClientParam) (*pubsub.SchemaC
 		}
 	}
 
-	client, err := pubsub.NewSchemaClient(context.Background(), p.Config.GetString("modules.gcppubsub.project.id"), schemaClientOptions...)
+	client, err := pubsub.NewSchemaClient(p.Context, projectID, schemaClientOptions...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pubsub schema client: %w", err)
 	}
@@ -144,13 +198,13 @@ type FxGcpPubSubPublisherParam struct {
 	fx.In
 	LifeCycle fx.Lifecycle
 	Config    *config.Config
-	Factory   *topic.TopicFactory
-	Registry  *topic.TopicRegistry
+	Factory   topic.TopicFactory
+	Registry  topic.TopicRegistry
 }
 
 // NewFxGcpPubSubPublisher returns a [Publisher].
-func NewFxGcpPubSubPublisher(p FxGcpPubSubPublisherParam) *Publisher {
-	publisher := NewPublisher(p.Factory, p.Registry)
+func NewFxGcpPubSubPublisher(p FxGcpPubSubPublisherParam) *DefaultPublisher {
+	publisher := NewDefaultPublisher(p.Factory, p.Registry)
 
 	if !p.Config.IsTestEnv() {
 		p.LifeCycle.Append(fx.Hook{
@@ -168,11 +222,11 @@ func NewFxGcpPubSubPublisher(p FxGcpPubSubPublisherParam) *Publisher {
 // FxGcpPubSubSubscriberParam allows injection of the required dependencies in [NewFxGcpPubSubPublisher].
 type FxGcpPubSubSubscriberParam struct {
 	fx.In
-	Factory  *subscription.SubscriptionFactory
-	Registry *subscription.SubscriptionRegistry
+	Factory  subscription.SubscriptionFactory
+	Registry subscription.SubscriptionRegistry
 }
 
 // NewFxGcpPubSubSubscriber returns a [Subscriber].
-func NewFxGcpPubSubSubscriber(p FxGcpPubSubSubscriberParam) *Subscriber {
-	return NewSubscriber(p.Factory, p.Registry)
+func NewFxGcpPubSubSubscriber(p FxGcpPubSubSubscriberParam) *DefaultSubscriber {
+	return NewDefaultSubscriber(p.Factory, p.Registry)
 }

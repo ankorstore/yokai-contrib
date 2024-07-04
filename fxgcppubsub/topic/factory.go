@@ -9,43 +9,58 @@ import (
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/schema"
 )
 
-type TopicFactory struct {
-	client   *pubsub.Client
-	registry *schema.SchemaRegistry
+var _ TopicFactory = (*DefaultTopicFactory)(nil)
+
+// TopicFactory is the interface for Topic factories.
+type TopicFactory interface {
+	Create(ctx context.Context, topicID string) (*Topic, error)
 }
 
-func NewTopicFactory(client *pubsub.Client, registry *schema.SchemaRegistry) *TopicFactory {
-	return &TopicFactory{
+// DefaultTopicFactory is the default TopicFactory implementation.
+type DefaultTopicFactory struct {
+	client   *pubsub.Client
+	registry schema.SchemaConfigRegistry
+	factory  codec.CodecFactory
+}
+
+// NewDefaultTopicFactory returns a new DefaultTopicFactory instance.
+func NewDefaultTopicFactory(client *pubsub.Client, registry schema.SchemaConfigRegistry, factory codec.CodecFactory) *DefaultTopicFactory {
+	return &DefaultTopicFactory{
 		client:   client,
 		registry: registry,
+		factory:  factory,
 	}
 }
 
-func (f *TopicFactory) Create(ctx context.Context, topicID string) (*Topic, error) {
+// Create creates a new Topic.
+func (f *DefaultTopicFactory) Create(ctx context.Context, topicID string) (*Topic, error) {
 	// topic
 	topic := f.client.Topic(topicID)
 
 	// topic config
 	topicConfig, err := topic.Config(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get topic config: %w", err)
+		return nil, fmt.Errorf("cannot get topic configuration: %w", err)
 	}
-
-	// topic schema settings
-	topicSchemaSettings := topicConfig.SchemaSettings
 
 	// topic schema config
-	var topicSchemaConfig *pubsub.SchemaConfig
-	if topicSchemaSettings != nil {
-		topicSchemaConfig, err = f.registry.Get(ctx, topicSchemaSettings.Schema)
+	topicSchemaType := pubsub.SchemaTypeUnspecified
+	topicSchemaEncoding := pubsub.EncodingUnspecified
+	topicSchemaDefinition := ""
+
+	if topicConfig.SchemaSettings != nil {
+		topicSchemaConfig, err := f.registry.Get(ctx, topicConfig.SchemaSettings.Schema)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("cannot get topic schema configuration: %w", err)
 		}
+
+		topicSchemaType = topicSchemaConfig.Type
+		topicSchemaEncoding = topicConfig.SchemaSettings.Encoding
+		topicSchemaDefinition = topicSchemaConfig.Definition
 	}
 
-	// codec
-	topicCodec := codec.NewCodec(topicSchemaConfig, topicSchemaSettings)
-
-	// create
-	return NewTopic(topic, topicCodec), nil
+	return NewTopic(
+		f.factory.Create(topicSchemaType, topicSchemaEncoding, topicSchemaDefinition),
+		topic,
+	), nil
 }

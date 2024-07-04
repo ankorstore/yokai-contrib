@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package simple;
+
+option go_package = "github.com/ankorstore/yokai-contrib/fxgcppubsub/testdata/proto";
+
+message SimpleRecord {
+  string string_field = 1;
+  float float_field = 2;
+  bool boolean_field = 3;
+}

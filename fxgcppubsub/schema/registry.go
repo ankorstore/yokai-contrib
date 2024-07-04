@@ -2,32 +2,40 @@ package schema
 
 import (
 	"context"
-	"strings"
+	"fmt"
 	"sync"
 
 	"cloud.google.com/go/pubsub"
 )
 
-type SchemaRegistry struct {
+var _ SchemaConfigRegistry = (*DefaultSchemaConfigRegistry)(nil)
+
+// SchemaConfigRegistry is the interface for schema config registries.
+type SchemaConfigRegistry interface {
+	Get(ctx context.Context, schemaID string) (*pubsub.SchemaConfig, error)
+}
+
+// DefaultSchemaConfigRegistry is the default SchemaConfigRegistry implementation.
+type DefaultSchemaConfigRegistry struct {
 	client  *pubsub.SchemaClient
 	schemas map[string]*pubsub.SchemaConfig
 	mutex   sync.RWMutex
 }
 
-func NewSchemaRegistry(client *pubsub.SchemaClient) *SchemaRegistry {
-	return &SchemaRegistry{
+// NewDefaultSchemaConfigRegistry returns a new DefaultSchemaConfigRegistry instance.
+func NewDefaultSchemaConfigRegistry(client *pubsub.SchemaClient) *DefaultSchemaConfigRegistry {
+	return &DefaultSchemaConfigRegistry{
 		client:  client,
 		schemas: make(map[string]*pubsub.SchemaConfig),
 	}
 }
 
-func (r *SchemaRegistry) Get(ctx context.Context, schemaID string) (*pubsub.SchemaConfig, error) {
+// Get gets a pubsub.SchemaConfig for a provided schemaID.
+func (r *DefaultSchemaConfigRegistry) Get(ctx context.Context, schemaID string) (*pubsub.SchemaConfig, error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	if strings.Contains(schemaID, "/") {
-		schemaID = ExtractID(schemaID)
-	}
+	schemaID = NormalizeSchemaID(schemaID)
 
 	if _, found := r.schemas[schemaID]; found {
 		return r.schemas[schemaID], nil
@@ -35,7 +43,7 @@ func (r *SchemaRegistry) Get(ctx context.Context, schemaID string) (*pubsub.Sche
 
 	schema, err := r.client.Schema(ctx, schemaID, pubsub.SchemaViewFull)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot get schema configuration: %w", err)
 	}
 
 	r.schemas[schemaID] = schema

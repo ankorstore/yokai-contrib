@@ -7,34 +7,44 @@ import (
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/subscription"
 )
 
-type Subscriber struct {
-	factory  *subscription.SubscriptionFactory
-	registry *subscription.SubscriptionRegistry
+var _ Subscriber = (*DefaultSubscriber)(nil)
+
+// Subscriber is the interface for high level subscribers.
+type Subscriber interface {
+	Subscribe(ctx context.Context, subscriptionID string, f subscription.SubscribeFunc, options ...subscription.SubscribeOption) error
 }
 
-func NewSubscriber(factory *subscription.SubscriptionFactory, registry *subscription.SubscriptionRegistry) *Subscriber {
-	return &Subscriber{
+// DefaultSubscriber is the default Subscriber implementation.
+type DefaultSubscriber struct {
+	factory  subscription.SubscriptionFactory
+	registry subscription.SubscriptionRegistry
+}
+
+// NewDefaultSubscriber returns a new DefaultSubscriber instance.
+func NewDefaultSubscriber(factory subscription.SubscriptionFactory, registry subscription.SubscriptionRegistry) *DefaultSubscriber {
+	return &DefaultSubscriber{
 		factory:  factory,
 		registry: registry,
 	}
 }
 
-func (s *Subscriber) Subscribe(ctx context.Context, subscriptionID string, f subscription.SubscribeFunc, options ...subscription.SubscribeOption) error {
-	// get subscription
+// Subscribe handle received data using a subscription.SubscribeFunc, with options, from a given subscriptionID.
+func (s *DefaultSubscriber) Subscribe(ctx context.Context, subscriptionID string, f subscription.SubscribeFunc, options ...subscription.SubscribeOption) error {
+	// retrieve subscription
 	if !s.registry.Has(subscriptionID) {
-		subscription, err := s.factory.Create(ctx, subscriptionID)
+		sub, err := s.factory.Create(ctx, subscriptionID)
 		if err != nil {
-			return err
+			return fmt.Errorf("cannot create subscription: %w", err)
 		}
 
-		s.registry.Add(subscription)
+		s.registry.Add(sub)
 	}
 
-	subscription, err := s.registry.Get(subscriptionID)
+	sub, err := s.registry.Get(subscriptionID)
 	if err != nil {
-		return fmt.Errorf("cannot get subsciption: %w", err)
+		return fmt.Errorf("cannot get subscription: %w", err)
 	}
 
 	// subscribe
-	return subscription.WithOptions(options...).Subscribe(ctx, f)
+	return sub.WithOptions(options...).Subscribe(ctx, f)
 }
