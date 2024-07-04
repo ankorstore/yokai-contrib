@@ -10,6 +10,7 @@ linters:
     - bodyclose
     - containedctx
     - contextcheck
+    - cyclop
     - decorder
     - dogsled
     - durationcheck
@@ -17,6 +18,7 @@ linters:
     - errchkjson
     - errname
     - errorlint
+    - exhaustive
     - forbidigo
     - forcetypeassert
     - gocognit

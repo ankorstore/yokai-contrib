@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//nolint:maintidx
 func TestDefaultCodec(t *testing.T) {
 	t.Parallel()
 
@@ -239,6 +240,66 @@ func TestDefaultCodec(t *testing.T) {
 		err := defaultCodec.Decode([]byte("invalid"), &out)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "cannot decode proto json")
+	})
+
+	t.Run("invalid schema type encoding failure", func(t *testing.T) {
+		t.Parallel()
+
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaType(99), pubsub.EncodingJSON, "")
+
+		_, err := defaultCodec.Encode([]byte("invalid"))
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid schema type")
+	})
+
+	t.Run("avro invalid encoding failure", func(t *testing.T) {
+		t.Parallel()
+
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.SchemaEncoding(99), "")
+
+		_, err := defaultCodec.Encode([]byte("invalid"))
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid avro encoding")
+	})
+
+	t.Run("proto invalid encoding failure", func(t *testing.T) {
+		t.Parallel()
+
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.SchemaEncoding(99), "")
+
+		_, err := defaultCodec.Encode([]byte("invalid"))
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid proto encoding")
+	})
+
+	t.Run("invalid schema type decoding failure", func(t *testing.T) {
+		t.Parallel()
+
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaType(99), pubsub.EncodingJSON, "")
+
+		err := defaultCodec.Decode([]byte("invalid"), struct{}{})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid schema type")
+	})
+
+	t.Run("avro invalid decoding failure", func(t *testing.T) {
+		t.Parallel()
+
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.SchemaEncoding(99), "")
+
+		err := defaultCodec.Decode([]byte("invalid"), struct{}{})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid avro encoding")
+	})
+
+	t.Run("proto invalid decoding failure", func(t *testing.T) {
+		t.Parallel()
+
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.SchemaEncoding(99), "")
+
+		err := defaultCodec.Decode([]byte("invalid"), struct{}{})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid proto encoding")
 	})
 }
 

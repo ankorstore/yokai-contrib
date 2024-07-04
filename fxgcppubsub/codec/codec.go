@@ -36,6 +36,8 @@ func NewDefaultCodec(schemaType pubsub.SchemaType, schemaEncoding pubsub.SchemaE
 }
 
 // Encode encodes an input into an avro or protobuf encoded slice of bytes.
+//
+//nolint:cyclop,exhaustive
 func (c *DefaultCodec) Encode(in any) ([]byte, error) {
 	switch c.schemaType {
 	case pubsub.SchemaTypeUnspecified:
@@ -64,8 +66,11 @@ func (c *DefaultCodec) Encode(in any) ([]byte, error) {
 }
 
 // Decode decodes an avro or protobuf encoded slice of bytes into a provided output.
+//
+//nolint:cyclop,exhaustive
 func (c *DefaultCodec) Decode(enc []byte, out any) error {
 	switch c.schemaType {
+	//nolint:exhaustive
 	case pubsub.SchemaTypeUnspecified:
 		return fmt.Errorf("data without schema cannot be decoded")
 	case pubsub.SchemaAvro:
