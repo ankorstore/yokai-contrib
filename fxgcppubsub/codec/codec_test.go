@@ -2,7 +2,6 @@ package codec_test
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"cloud.google.com/go/pubsub"
@@ -15,6 +14,9 @@ import (
 //nolint:maintidx
 func TestDefaultCodec(t *testing.T) {
 	t.Parallel()
+
+	avroSchemaDefinition := avro.GetTestAvroSchemaDefinition(t)
+	protoSchemaDefinition := proto.GetTestProtoSchemaDefinition(t)
 
 	t.Run("raw encoding success", func(t *testing.T) {
 		t.Parallel()
@@ -53,7 +55,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("avro binary encoding and decoding success", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingBinary, getTestAvroSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingBinary, avroSchemaDefinition)
 
 		in := avro.SimpleRecord{
 			StringField:  "test",
@@ -75,7 +77,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("avro binary encoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingBinary, getTestAvroSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingBinary, avroSchemaDefinition)
 
 		in := avro.InvalidSimpleRecord{
 			StringField:  true,
@@ -91,7 +93,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("avro binary decoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingBinary, getTestAvroSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingBinary, avroSchemaDefinition)
 
 		out := avro.SimpleRecord{}
 
@@ -103,7 +105,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("avro json encoding and decoding success", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingJSON, getTestAvroSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingJSON, avroSchemaDefinition)
 
 		in := avro.SimpleRecord{
 			StringField:  "test",
@@ -125,7 +127,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("avro json encoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingJSON, getTestAvroSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingJSON, avroSchemaDefinition)
 
 		in := avro.InvalidSimpleRecord{
 			StringField:  true,
@@ -141,7 +143,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("avro json decoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingJSON, getTestAvroSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingJSON, avroSchemaDefinition)
 
 		out := avro.SimpleRecord{}
 
@@ -153,7 +155,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("protobuf binary encoding and decoding success", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingBinary, getTestProtoSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingBinary, protoSchemaDefinition)
 
 		in := &proto.SimpleRecord{
 			StringField:  "test",
@@ -177,7 +179,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("protobuf binary encoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingBinary, getTestProtoSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingBinary, protoSchemaDefinition)
 
 		_, err := defaultCodec.Encode(struct{}{})
 		assert.Error(t, err)
@@ -187,7 +189,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("protobuf binary decoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingBinary, getTestProtoSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingBinary, protoSchemaDefinition)
 
 		out := proto.SimpleRecord{}
 
@@ -199,7 +201,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("protobuf json encoding and decoding success", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingJSON, getTestProtoSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingJSON, protoSchemaDefinition)
 
 		in := &proto.SimpleRecord{
 			StringField:  "test",
@@ -223,7 +225,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("protobuf json encoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingJSON, getTestProtoSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingJSON, protoSchemaDefinition)
 
 		_, err := defaultCodec.Encode(struct{}{})
 		assert.Error(t, err)
@@ -233,7 +235,7 @@ func TestDefaultCodec(t *testing.T) {
 	t.Run("protobuf json decoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingJSON, getTestProtoSchemaDefinition(t))
+		defaultCodec := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingJSON, protoSchemaDefinition)
 
 		out := proto.SimpleRecord{}
 
@@ -301,22 +303,4 @@ func TestDefaultCodec(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "invalid proto encoding")
 	})
-}
-
-func getTestAvroSchemaDefinition(tb testing.TB) string {
-	tb.Helper()
-
-	data, err := os.ReadFile("../testdata/avro/simple.avsc")
-	assert.NoError(tb, err)
-
-	return string(data)
-}
-
-func getTestProtoSchemaDefinition(tb testing.TB) string {
-	tb.Helper()
-
-	data, err := os.ReadFile("../testdata/proto/simple.proto")
-	assert.NoError(tb, err)
-
-	return string(data)
 }

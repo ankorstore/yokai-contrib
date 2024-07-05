@@ -2,7 +2,6 @@ package subscription_test
 
 import (
 	"context"
-	"os"
 	"testing"
 	"time"
 
@@ -30,8 +29,8 @@ func TestSubscription(t *testing.T) {
 	var supervisor *reactor.WaiterSupervisor
 
 	ctx := context.Background()
-	avroSchemaDefinition := getTestAvroSchemaDefinition(t)
-	protoSchemaDefinition := getTestProtoSchemaDefinition(t)
+	avroSchemaDefinition := avro.GetTestAvroSchemaDefinition(t)
+	protoSchemaDefinition := proto.GetTestProtoSchemaDefinition(t)
 
 	fxtest.New(
 		t,
@@ -180,22 +179,4 @@ func TestSubscription(t *testing.T) {
 		assert.Equal(t, float32(56.78), out.FloatField)
 		assert.False(t, out.BooleanField)
 	})
-}
-
-func getTestAvroSchemaDefinition(tb testing.TB) string {
-	tb.Helper()
-
-	data, err := os.ReadFile("../testdata/avro/simple.avsc")
-	assert.NoError(tb, err)
-
-	return string(data)
-}
-
-func getTestProtoSchemaDefinition(tb testing.TB) string {
-	tb.Helper()
-
-	data, err := os.ReadFile("../testdata/proto/simple.proto")
-	assert.NoError(tb, err)
-
-	return string(data)
 }
