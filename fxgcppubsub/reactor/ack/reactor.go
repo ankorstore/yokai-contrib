@@ -26,8 +26,7 @@ func (r *AckReactor) FuncNames() []string {
 
 // React is the reactor logic.
 func (r *AckReactor) React(req interface{}) (handled bool, ret interface{}, err error) {
-	ackReq, ok := req.(*pubsubpb.AcknowledgeRequest)
-	if ok {
+	if ackReq, ok := req.(*pubsubpb.AcknowledgeRequest); ok {
 		r.supervisor.StopWaiter(ackReq.Subscription, ackReq.AckIds, nil)
 	}
 

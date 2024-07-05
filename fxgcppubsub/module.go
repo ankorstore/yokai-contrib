@@ -23,7 +23,7 @@ import (
 // ModuleName is the module name.
 const ModuleName = "gcppubsub"
 
-// FxGcpPubSubModule is the [Fx] pubsub module.
+// FxGcpPubSubModule is the [Fx] GCP pub/sub module.
 //
 // [Fx]: https://github.com/uber-go/fx
 var FxGcpPubSubModule = fx.Module(
@@ -69,7 +69,6 @@ var FxGcpPubSubModule = fx.Module(
 		NewFxGcpPubSubClient,
 		NewFxGcpPubSubSchemaClient,
 	),
-
 	AsPubSubTestServerReactor(ack.NewAckReactor),
 )
 

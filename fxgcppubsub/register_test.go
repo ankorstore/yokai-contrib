@@ -21,7 +21,10 @@ func TestAsPubSubTestServerReactor(t *testing.T) {
 func TestAsPubSubTestServerReactors(t *testing.T) {
 	t.Parallel()
 
-	result := fxgcppubsub.AsPubSubTestServerReactors(log.NewLogReactor, ack.NewAckReactor)
+	result := fxgcppubsub.AsPubSubTestServerReactors(
+		log.NewLogReactor,
+		ack.NewAckReactor,
+	)
 
 	assert.Equal(t, "fx.optionGroup", fmt.Sprintf("%T", result))
 }
