@@ -8,7 +8,7 @@ import (
 	"cloud.google.com/go/pubsub"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/message"
-	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor/ack"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/testdata/avro"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/testdata/proto"
 	"github.com/ankorstore/yokai/fxconfig"
@@ -24,7 +24,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 
 	var publisher fxgcppubsub.Publisher
 	var subscriber fxgcppubsub.Subscriber
-	var supervisor reactor.WaiterSupervisor
+	var supervisor ack.AckSupervisor
 
 	ctx := context.Background()
 	avroSchemaDefinition := avro.GetTestAvroSchemaDefinition(t)
@@ -76,7 +76,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 
 		publisher.Stop()
 
-		waiter := supervisor.StartWaiter("projects/test-project/subscriptions/raw-subscription")
+		waiter := supervisor.StartAckWaiter("raw-subscription")
 
 		//nolint:errcheck
 		go subscriber.Subscribe(ctx, "raw-subscription", func(ctx context.Context, m *message.Message) {
@@ -104,7 +104,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 
 		publisher.Stop()
 
-		waiter := supervisor.StartWaiter("projects/test-project/subscriptions/avro-subscription")
+		waiter := supervisor.StartAckWaiter("avro-subscription")
 
 		//nolint:errcheck
 		go subscriber.Subscribe(ctx, "avro-subscription", func(ctx context.Context, m *message.Message) {
@@ -139,7 +139,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 
 		publisher.Stop()
 
-		waiter := supervisor.StartWaiter("projects/test-project/subscriptions/proto-subscription")
+		waiter := supervisor.StartAckWaiter("proto-subscription")
 
 		//nolint:errcheck
 		go subscriber.Subscribe(ctx, "proto-subscription", func(ctx context.Context, m *message.Message) {

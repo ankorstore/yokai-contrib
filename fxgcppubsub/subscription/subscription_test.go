@@ -9,7 +9,7 @@ import (
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/codec"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/message"
-	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor/ack"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/subscription"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/testdata/avro"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/testdata/proto"
@@ -25,7 +25,7 @@ func TestSubscription(t *testing.T) {
 	t.Setenv("GCP_PROJECT_ID", "test-project")
 
 	var publisher fxgcppubsub.Publisher
-	var supervisor reactor.WaiterSupervisor
+	var supervisor ack.AckSupervisor
 	var client *pubsub.Client
 
 	ctx := context.Background()
@@ -84,7 +84,7 @@ func TestSubscription(t *testing.T) {
 		_, err := publisher.Publish(ctx, "raw-topic", []byte("raw data"))
 		assert.NoError(t, err)
 
-		waiter := supervisor.StartWaiter("projects/test-project/subscriptions/raw-subscription")
+		waiter := supervisor.StartAckWaiter("raw-subscription")
 
 		var out []byte
 
@@ -118,7 +118,7 @@ func TestSubscription(t *testing.T) {
 		})
 		assert.NoError(t, err)
 
-		waiter := supervisor.StartWaiter("projects/test-project/subscriptions/avro-subscription")
+		waiter := supervisor.StartAckWaiter("avro-subscription")
 
 		var out avro.SimpleRecord
 
@@ -155,7 +155,7 @@ func TestSubscription(t *testing.T) {
 		})
 		assert.NoError(t, err)
 
-		waiter := supervisor.StartWaiter("projects/test-project/subscriptions/proto-subscription")
+		waiter := supervisor.StartAckWaiter("proto-subscription")
 
 		var out proto.SimpleRecord
 

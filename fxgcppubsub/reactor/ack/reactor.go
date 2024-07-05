@@ -2,16 +2,15 @@ package ack
 
 import (
 	"cloud.google.com/go/pubsub/apiv1/pubsubpb"
-	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor"
 )
 
 // AckReactor is a pub/sub test server reactor for subscriptions message acks.
 type AckReactor struct {
-	supervisor reactor.WaiterSupervisor
+	supervisor AckSupervisor
 }
 
 // NewAckReactor returns a new AckReactor instance.
-func NewAckReactor(supervisor reactor.WaiterSupervisor) *AckReactor {
+func NewAckReactor(supervisor AckSupervisor) *AckReactor {
 	return &AckReactor{
 		supervisor: supervisor,
 	}
@@ -27,7 +26,7 @@ func (r *AckReactor) FuncNames() []string {
 // React is the reactor logic.
 func (r *AckReactor) React(req any) (bool, any, error) {
 	if ackReq, ok := req.(*pubsubpb.AcknowledgeRequest); ok {
-		r.supervisor.StopWaiter(ackReq.Subscription, ackReq.AckIds, nil)
+		r.supervisor.StopAckWaiter(ackReq.Subscription, ackReq.AckIds, nil)
 	}
 
 	return false, nil, nil

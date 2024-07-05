@@ -29,6 +29,13 @@ const ModuleName = "gcppubsub"
 var FxGcpPubSubModule = fx.Module(
 	ModuleName,
 	fx.Provide(
+		NewFxGcpPubSubTestServer,
+		NewFxGcpPubSubClient,
+		NewFxGcpPubSubSchemaClient,
+		fx.Annotate(
+			ack.NewDefaultAckSupervisor,
+			fx.As(new(ack.AckSupervisor)),
+		),
 		fx.Annotate(
 			codec.NewDefaultCodecFactory,
 			fx.As(new(codec.CodecFactory)),
@@ -65,9 +72,6 @@ var FxGcpPubSubModule = fx.Module(
 			NewFxGcpPubSubSubscriber,
 			fx.As(new(Subscriber)),
 		),
-		NewFxGcpPubSubTestServer,
-		NewFxGcpPubSubClient,
-		NewFxGcpPubSubSchemaClient,
 	),
 	AsPubSubTestServerReactor(ack.NewAckReactor),
 )

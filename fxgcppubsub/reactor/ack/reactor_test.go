@@ -6,33 +6,46 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub/apiv1/pubsubpb"
-	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor/ack"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/subscription"
+	"github.com/ankorstore/yokai/fxconfig"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/fx"
+	"go.uber.org/fx/fxtest"
 )
 
 func TestAckReactor(t *testing.T) {
-	t.Parallel()
+	t.Setenv("APP_ENV", "test")
+	t.Setenv("APP_CONFIG_PATH", "../../testdata/config")
+	t.Setenv("GCP_PROJECT_ID", "test-project")
 
-	supervisor := reactor.NewDefaultWaiterSupervisor()
+	var sup ack.AckSupervisor
 
-	react := ack.NewAckReactor(supervisor)
+	ctx := context.Background()
+
+	fxtest.New(
+		t,
+		fx.NopLogger,
+		fxconfig.FxConfigModule,
+		fxgcppubsub.FxGcpPubSubModule,
+		fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
+		fx.Populate(&sup),
+	).RequireStart().RequireStop()
+
+	react := ack.NewAckReactor(sup)
 
 	t.Run("func names", func(t *testing.T) {
-		t.Parallel()
-
 		assert.Equal(t, []string{"Acknowledge"}, react.FuncNames())
 	})
 
 	t.Run("react", func(t *testing.T) {
-		t.Parallel()
-
 		req := &pubsubpb.AcknowledgeRequest{
-			Subscription: "test-subscription",
+			Subscription: subscription.NormalizeSubscriptionName("test-project", "test-subscription"),
 			AckIds:       []string{"test-id"},
 		}
 
-		waiter := supervisor.StartWaiter("test-subscription")
+		waiter := sup.StartAckWaiter("test-subscription")
 
 		go func() {
 			rHandled, rRet, rErr := react.React(req)
