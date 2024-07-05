@@ -25,8 +25,8 @@ func TestSubscription(t *testing.T) {
 	t.Setenv("GCP_PROJECT_ID", "test-project")
 
 	var publisher fxgcppubsub.Publisher
+	var supervisor reactor.WaiterSupervisor
 	var client *pubsub.Client
-	var supervisor *reactor.WaiterSupervisor
 
 	ctx := context.Background()
 	avroSchemaDefinition := avro.GetTestAvroSchemaDefinition(t)

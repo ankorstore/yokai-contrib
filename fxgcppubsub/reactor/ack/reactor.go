@@ -7,11 +7,11 @@ import (
 
 // AckReactor is a pub/sub test server reactor for subscriptions message acks.
 type AckReactor struct {
-	supervisor *reactor.WaiterSupervisor
+	supervisor reactor.WaiterSupervisor
 }
 
 // NewAckReactor returns a new AckReactor instance.
-func NewAckReactor(supervisor *reactor.WaiterSupervisor) *AckReactor {
+func NewAckReactor(supervisor reactor.WaiterSupervisor) *AckReactor {
 	return &AckReactor{
 		supervisor: supervisor,
 	}

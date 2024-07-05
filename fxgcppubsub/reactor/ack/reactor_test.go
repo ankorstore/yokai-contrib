@@ -14,7 +14,7 @@ import (
 func TestAckReactor(t *testing.T) {
 	t.Parallel()
 
-	supervisor := reactor.NewWaiterSupervisor()
+	supervisor := reactor.NewDefaultWaiterSupervisor()
 
 	react := ack.NewAckReactor(supervisor)
 

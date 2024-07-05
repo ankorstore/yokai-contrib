@@ -24,7 +24,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 
 	var publisher fxgcppubsub.Publisher
 	var subscriber fxgcppubsub.Subscriber
-	var supervisor *reactor.WaiterSupervisor
+	var supervisor reactor.WaiterSupervisor
 
 	ctx := context.Background()
 	avroSchemaDefinition := avro.GetTestAvroSchemaDefinition(t)
@@ -74,6 +74,8 @@ func TestFxGcpPubSubModule(t *testing.T) {
 		assert.NotEmpty(t, sid)
 		assert.NoError(t, err)
 
+		publisher.Stop()
+
 		waiter := supervisor.StartWaiter("projects/test-project/subscriptions/raw-subscription")
 
 		//nolint:errcheck
@@ -99,6 +101,8 @@ func TestFxGcpPubSubModule(t *testing.T) {
 		sid, err := res.Get(ctx)
 		assert.NotEmpty(t, sid)
 		assert.NoError(t, err)
+
+		publisher.Stop()
 
 		waiter := supervisor.StartWaiter("projects/test-project/subscriptions/avro-subscription")
 
@@ -132,6 +136,8 @@ func TestFxGcpPubSubModule(t *testing.T) {
 		sid, err := res.Get(ctx)
 		assert.NotEmpty(t, sid)
 		assert.NoError(t, err)
+
+		publisher.Stop()
 
 		waiter := supervisor.StartWaiter("projects/test-project/subscriptions/proto-subscription")
 

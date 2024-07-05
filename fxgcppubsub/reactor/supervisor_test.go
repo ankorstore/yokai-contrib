@@ -10,19 +10,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestWaiterSupervisor(t *testing.T) {
+func TestDefaultWaiterSupervisor(t *testing.T) {
 	t.Parallel()
 
 	t.Run("supervise", func(t *testing.T) {
 		t.Parallel()
 
-		supervisor := reactor.NewWaiterSupervisor()
+		supervisor := reactor.NewDefaultWaiterSupervisor()
 
 		waiter := supervisor.StartWaiter("target")
 
 		start := time.Now()
 
-		go func(s *reactor.WaiterSupervisor) {
+		go func(s reactor.WaiterSupervisor) {
 			time.Sleep(1 * time.Millisecond)
 
 			s.StopWaiter("target", "test", nil)
@@ -39,13 +39,13 @@ func TestWaiterSupervisor(t *testing.T) {
 	t.Run("supervise with error", func(t *testing.T) {
 		t.Parallel()
 
-		supervisor := reactor.NewWaiterSupervisor()
+		supervisor := reactor.NewDefaultWaiterSupervisor()
 
 		waiter := supervisor.StartWaiter("target")
 
 		start := time.Now()
 
-		go func(s *reactor.WaiterSupervisor) {
+		go func(s reactor.WaiterSupervisor) {
 			time.Sleep(1 * time.Millisecond)
 
 			s.StopWaiter("target", "test", fmt.Errorf("test error"))

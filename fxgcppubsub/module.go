@@ -29,10 +29,6 @@ const ModuleName = "gcppubsub"
 var FxGcpPubSubModule = fx.Module(
 	ModuleName,
 	fx.Provide(
-		NewFxGcpPubSubTestServerWaiterSupervisor,
-		NewFxGcpPubSubTestServer,
-		NewFxGcpPubSubClient,
-		NewFxGcpPubSubSchemaClient,
 		fx.Annotate(
 			codec.NewDefaultCodecFactory,
 			fx.As(new(codec.CodecFactory)),
@@ -58,6 +54,10 @@ var FxGcpPubSubModule = fx.Module(
 			fx.As(new(subscription.SubscriptionRegistry)),
 		),
 		fx.Annotate(
+			reactor.NewDefaultWaiterSupervisor,
+			fx.As(new(reactor.WaiterSupervisor)),
+		),
+		fx.Annotate(
 			NewFxGcpPubSubPublisher,
 			fx.As(new(Publisher)),
 		),
@@ -65,13 +65,13 @@ var FxGcpPubSubModule = fx.Module(
 			NewFxGcpPubSubSubscriber,
 			fx.As(new(Subscriber)),
 		),
+		NewFxGcpPubSubTestServer,
+		NewFxGcpPubSubClient,
+		NewFxGcpPubSubSchemaClient,
 	),
+
 	AsPubSubTestServerReactor(ack.NewAckReactor),
 )
-
-func NewFxGcpPubSubTestServerWaiterSupervisor() *reactor.WaiterSupervisor {
-	return reactor.NewWaiterSupervisor()
-}
 
 type FxGcpPubSubTestServerParam struct {
 	fx.In

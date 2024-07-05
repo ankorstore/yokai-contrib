@@ -25,8 +25,8 @@ func TestTopic(t *testing.T) {
 	t.Setenv("GCP_PROJECT_ID", "test-project")
 
 	var subscriber fxgcppubsub.Subscriber
+	var supervisor reactor.WaiterSupervisor
 	var client *pubsub.Client
-	var supervisor *reactor.WaiterSupervisor
 
 	ctx := context.Background()
 	avroSchemaDefinition := avro.GetTestAvroSchemaDefinition(t)

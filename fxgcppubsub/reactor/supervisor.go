@@ -4,21 +4,29 @@ import (
 	"sync"
 )
 
-// WaiterSupervisor is the supervisor for Waiter instances, affected to targets.
-type WaiterSupervisor struct {
+var _ WaiterSupervisor = (*DefaultWaiterSupervisor)(nil)
+
+// WaiterSupervisor is the interface for waiters supervisors.
+type WaiterSupervisor interface {
+	StartWaiter(target string) *Waiter
+	StopWaiter(target string, data any, err error)
+}
+
+// DefaultWaiterSupervisor is the default WaiterSupervisor implementation.
+type DefaultWaiterSupervisor struct {
 	waiters map[string]*Waiter
 	mutex   sync.RWMutex
 }
 
-// NewWaiterSupervisor returns a new WaiterSupervisor instance.
-func NewWaiterSupervisor() *WaiterSupervisor {
-	return &WaiterSupervisor{
+// NewDefaultWaiterSupervisor returns a new DefaultWaiterSupervisor instance.
+func NewDefaultWaiterSupervisor() *DefaultWaiterSupervisor {
+	return &DefaultWaiterSupervisor{
 		waiters: make(map[string]*Waiter),
 	}
 }
 
 // StartWaiter starts a Waiter for a target.
-func (s *WaiterSupervisor) StartWaiter(target string) *Waiter {
+func (s *DefaultWaiterSupervisor) StartWaiter(target string) *Waiter {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -30,7 +38,7 @@ func (s *WaiterSupervisor) StartWaiter(target string) *Waiter {
 }
 
 // StopWaiter stops a Waiter for a target with result.
-func (s *WaiterSupervisor) StopWaiter(target string, data any, err error) {
+func (s *DefaultWaiterSupervisor) StopWaiter(target string, data any, err error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
