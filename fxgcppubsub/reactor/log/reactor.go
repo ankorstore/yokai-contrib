@@ -48,7 +48,7 @@ func (r *LogReactor) FuncNames() []string {
 }
 
 // React is the reactor logic.
-func (r *LogReactor) React(req interface{}) (handled bool, ret interface{}, err error) {
+func (r *LogReactor) React(req interface{}) (bool, any, error) {
 	r.logger.Debug().Interface("req", req).Msg("log reactor")
 
 	return false, nil, nil
