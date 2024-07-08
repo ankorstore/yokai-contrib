@@ -369,7 +369,7 @@ In `test` mode:
 
 are all configured to work against a [pstest.Server](https://pkg.go.dev/cloud.google.com/go/pubsub@v1.40.0/pstest), avoiding the need to spin up any `Pub/Sub` real (or emulator) instance, for better tests portability.
 
-You can create `topics`, `subscriptions` and `schemas` locally only for your tests.
+This means that you can create `topics`, `subscriptions` and `schemas` locally only for your tests.
 
 For example:
 
@@ -432,7 +432,7 @@ func TestPubSub(t *testing.T) {
 		m.Ack()
 	})
 
-	// waits for subscriber message ack
+	// wait for subscriber message ack
 	_, err = waiter.WaitMaxDuration(ctx, time.Second)
 	assert.NoError(t, err)
 }
