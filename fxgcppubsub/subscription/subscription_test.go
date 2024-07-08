@@ -107,11 +107,13 @@ func TestSubscription(t *testing.T) {
 	})
 
 	t.Run("avro message", func(t *testing.T) {
-		cod := codec.NewAvroBinaryCodec(avroSchemaDefinition)
+		cod, err := codec.NewAvroBinaryCodec(avroSchemaDefinition)
+		assert.NoError(t, err)
+
 		baseSub := client.Subscription("avro-subscription")
 		sub := subscription.NewSubscription(cod, baseSub)
 
-		_, err := publisher.Publish(ctx, "avro-topic", &avro.SimpleRecord{
+		_, err = publisher.Publish(ctx, "avro-topic", &avro.SimpleRecord{
 			StringField:  "test avro",
 			FloatField:   12.34,
 			BooleanField: true,
@@ -144,7 +146,7 @@ func TestSubscription(t *testing.T) {
 	})
 
 	t.Run("proto message", func(t *testing.T) {
-		cod := codec.NewProtoBinaryCodec(protoSchemaDefinition)
+		cod := codec.NewProtoBinaryCodec()
 		baseSub := client.Subscription("proto-subscription")
 		sub := subscription.NewSubscription(cod, baseSub)
 

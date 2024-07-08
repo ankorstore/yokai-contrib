@@ -5,11 +5,16 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/codec"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/testdata/avro"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/testdata/proto"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDefaultCodecFactory(t *testing.T) {
 	t.Parallel()
+
+	avroSchemaDefinition := avro.GetTestAvroSchemaDefinition(t)
+	protoSchemaDefinition := proto.GetTestProtoSchemaDefinition(t)
 
 	t.Run("construction", func(t *testing.T) {
 		t.Parallel()
@@ -39,7 +44,7 @@ func TestDefaultCodecFactory(t *testing.T) {
 		cod, err := codec.NewDefaultCodecFactory().Create(
 			pubsub.SchemaAvro,
 			pubsub.EncodingBinary,
-			"",
+			avroSchemaDefinition,
 		)
 		assert.NoError(t, err)
 		assert.IsType(t, &codec.AvroBinaryCodec{}, cod)
@@ -52,7 +57,7 @@ func TestDefaultCodecFactory(t *testing.T) {
 		cod, err := codec.NewDefaultCodecFactory().Create(
 			pubsub.SchemaAvro,
 			pubsub.EncodingJSON,
-			"",
+			avroSchemaDefinition,
 		)
 		assert.NoError(t, err)
 		assert.IsType(t, &codec.AvroJsonCodec{}, cod)
@@ -65,7 +70,7 @@ func TestDefaultCodecFactory(t *testing.T) {
 		cod, err := codec.NewDefaultCodecFactory().Create(
 			pubsub.SchemaProtocolBuffer,
 			pubsub.EncodingBinary,
-			"",
+			protoSchemaDefinition,
 		)
 		assert.NoError(t, err)
 		assert.IsType(t, &codec.ProtoBinaryCodec{}, cod)
@@ -78,7 +83,7 @@ func TestDefaultCodecFactory(t *testing.T) {
 		cod, err := codec.NewDefaultCodecFactory().Create(
 			pubsub.SchemaProtocolBuffer,
 			pubsub.EncodingJSON,
-			"",
+			protoSchemaDefinition,
 		)
 		assert.NoError(t, err)
 		assert.IsType(t, &codec.ProtoJsonCodec{}, cod)

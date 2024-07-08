@@ -8,7 +8,7 @@ import (
 
 var _ CodecFactory = (*DefaultCodecFactory)(nil)
 
-// Codec is the interface for codecs in charge to handle raw, avro or protobuf encoding and decoding.
+// Codec is the interface for codecs in charge to handle encoding and decoding.
 type Codec interface {
 	Encode(in any) ([]byte, error)
 	Decode(enc []byte, out any) error
@@ -37,18 +37,18 @@ func (f *DefaultCodecFactory) Create(schemaType pubsub.SchemaType, schemaEncodin
 	case pubsub.SchemaAvro:
 		switch schemaEncoding {
 		case pubsub.EncodingBinary:
-			return NewAvroBinaryCodec(schemaDefinition), nil
+			return NewAvroBinaryCodec(schemaDefinition)
 		case pubsub.EncodingJSON:
-			return NewAvroJsonCodec(schemaDefinition), nil
+			return NewAvroJsonCodec(schemaDefinition)
 		default:
 			return nil, fmt.Errorf("invalid avro encoding")
 		}
 	case pubsub.SchemaProtocolBuffer:
 		switch schemaEncoding {
 		case pubsub.EncodingBinary:
-			return NewProtoBinaryCodec(schemaDefinition), nil
+			return NewProtoBinaryCodec(), nil
 		case pubsub.EncodingJSON:
-			return NewProtoJsonCodec(schemaDefinition), nil
+			return NewProtoJsonCodec(), nil
 		default:
 			return nil, fmt.Errorf("invalid proto encoding")
 		}

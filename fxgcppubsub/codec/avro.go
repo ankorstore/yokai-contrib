@@ -15,24 +15,22 @@ var (
 
 // AvroBinaryCodec is a Codec implementation for encoding and decoding with avro schema in binary format.
 type AvroBinaryCodec struct {
-	schemaDefinition string
+	schema avro.Schema
 }
 
 // NewAvroBinaryCodec returns a new AvroBinaryCodec instance.
-func NewAvroBinaryCodec(schemaDefinition string) *AvroBinaryCodec {
-	return &AvroBinaryCodec{
-		schemaDefinition: schemaDefinition,
-	}
-}
-
-// Encode encodes in avro binary format the provided input.
-func (c *AvroBinaryCodec) Encode(in any) ([]byte, error) {
-	avroSchema, err := avro.Parse(c.schemaDefinition)
+func NewAvroBinaryCodec(schemaDefinition string) (*AvroBinaryCodec, error) {
+	schema, err := avro.Parse(schemaDefinition)
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse avro schema: %w", err)
 	}
 
-	out, err := avro.Marshal(avroSchema, in)
+	return &AvroBinaryCodec{schema: schema}, nil
+}
+
+// Encode encodes in avro binary format the provided input.
+func (c *AvroBinaryCodec) Encode(in any) ([]byte, error) {
+	out, err := avro.Marshal(c.schema, in)
 	if err != nil {
 		return nil, fmt.Errorf("cannot encode avro binary: %w", err)
 	}
@@ -42,12 +40,7 @@ func (c *AvroBinaryCodec) Encode(in any) ([]byte, error) {
 
 // Decode decodes from avro binary format the provided input.
 func (c *AvroBinaryCodec) Decode(enc []byte, out any) error {
-	avroSchema, err := avro.Parse(c.schemaDefinition)
-	if err != nil {
-		return fmt.Errorf("cannot parse avro schema: %w", err)
-	}
-
-	err = avro.Unmarshal(avroSchema, enc, out)
+	err := avro.Unmarshal(c.schema, enc, out)
 	if err != nil {
 		return fmt.Errorf("cannot decode avro binary: %w", err)
 	}
@@ -57,29 +50,27 @@ func (c *AvroBinaryCodec) Decode(enc []byte, out any) error {
 
 // AvroJsonCodec is a Codec implementation for encoding and decoding with avro schema in json format.
 type AvroJsonCodec struct {
-	schemaDefinition string
+	codec *goavro.Codec
 }
 
-// NewAvroJsonCodec returns a new AvroBinaryCodec instance.
-func NewAvroJsonCodec(schemaDefinition string) *AvroJsonCodec {
-	return &AvroJsonCodec{
-		schemaDefinition: schemaDefinition,
-	}
-}
-
-// Encode encodes in avro json format.
-func (c *AvroJsonCodec) Encode(in any) ([]byte, error) {
-	avroSchema, err := goavro.NewCodec(c.schemaDefinition)
+// NewAvroJsonCodec returns a new AvroJsonCodec instance.
+func NewAvroJsonCodec(schemaDefinition string) (*AvroJsonCodec, error) {
+	codec, err := goavro.NewCodec(schemaDefinition)
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse avro schema: %w", err)
 	}
 
+	return &AvroJsonCodec{codec: codec}, nil
+}
+
+// Encode encodes in avro json format.
+func (c *AvroJsonCodec) Encode(in any) ([]byte, error) {
 	inMap, err := c.convertStructIntoMap(in)
 	if err != nil {
 		return nil, fmt.Errorf("cannot convert struct into map: %w", err)
 	}
 
-	out, err := avroSchema.TextualFromNative(nil, inMap)
+	out, err := c.codec.TextualFromNative(nil, inMap)
 	if err != nil {
 		return nil, fmt.Errorf("cannot encode avro json: %w", err)
 	}
@@ -89,12 +80,7 @@ func (c *AvroJsonCodec) Encode(in any) ([]byte, error) {
 
 // Decode decodes from avro json format.
 func (c *AvroJsonCodec) Decode(enc []byte, out any) error {
-	avroSchema, err := goavro.NewCodec(c.schemaDefinition)
-	if err != nil {
-		return fmt.Errorf("cannot parse avro schema: %w", err)
-	}
-
-	data, _, err := avroSchema.NativeFromTextual(enc)
+	data, _, err := c.codec.NativeFromTextual(enc)
 	if err != nil {
 		return fmt.Errorf("cannot decode avro json: %w", err)
 	}

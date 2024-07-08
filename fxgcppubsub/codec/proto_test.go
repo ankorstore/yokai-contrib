@@ -11,12 +11,10 @@ import (
 func TestProtoBinaryCodec(t *testing.T) {
 	t.Parallel()
 
-	schemaDefinition := proto.GetTestProtoSchemaDefinition(t)
-
 	t.Run("protobuf binary encoding and decoding success", func(t *testing.T) {
 		t.Parallel()
 
-		protoBinaryCodec := codec.NewProtoBinaryCodec(schemaDefinition)
+		protoBinaryCodec := codec.NewProtoBinaryCodec()
 
 		in := &proto.SimpleRecord{
 			StringField:  "test",
@@ -40,7 +38,7 @@ func TestProtoBinaryCodec(t *testing.T) {
 	t.Run("protobuf binary encoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		protoBinaryCodec := codec.NewProtoBinaryCodec(schemaDefinition)
+		protoBinaryCodec := codec.NewProtoBinaryCodec()
 
 		_, err := protoBinaryCodec.Encode(struct{}{})
 		assert.Error(t, err)
@@ -50,7 +48,7 @@ func TestProtoBinaryCodec(t *testing.T) {
 	t.Run("protobuf binary decoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		protoBinaryCodec := codec.NewProtoBinaryCodec(schemaDefinition)
+		protoBinaryCodec := codec.NewProtoBinaryCodec()
 
 		out := proto.SimpleRecord{}
 
@@ -63,12 +61,10 @@ func TestProtoBinaryCodec(t *testing.T) {
 func TestProtoJsonCodec(t *testing.T) {
 	t.Parallel()
 
-	schemaDefinition := proto.GetTestProtoSchemaDefinition(t)
-
 	t.Run("protobuf json encoding and decoding success", func(t *testing.T) {
 		t.Parallel()
 
-		protoJsonCodec := codec.NewProtoJsonCodec(schemaDefinition)
+		protoJsonCodec := codec.NewProtoJsonCodec()
 
 		in := &proto.SimpleRecord{
 			StringField:  "test",
@@ -92,7 +88,7 @@ func TestProtoJsonCodec(t *testing.T) {
 	t.Run("protobuf json encoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		protoJsonCodec := codec.NewProtoJsonCodec(schemaDefinition)
+		protoJsonCodec := codec.NewProtoJsonCodec()
 
 		_, err := protoJsonCodec.Encode(struct{}{})
 		assert.Error(t, err)
@@ -102,7 +98,7 @@ func TestProtoJsonCodec(t *testing.T) {
 	t.Run("protobuf json decoding failure", func(t *testing.T) {
 		t.Parallel()
 
-		protoJsonCodec := codec.NewProtoJsonCodec(schemaDefinition)
+		protoJsonCodec := codec.NewProtoJsonCodec()
 
 		out := proto.SimpleRecord{}
 

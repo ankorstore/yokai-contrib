@@ -14,14 +14,11 @@ var (
 
 // ProtoBinaryCodec is a Codec implementation for encoding and decoding with protobuf schema in binary format.
 type ProtoBinaryCodec struct {
-	schemaDefinition string
 }
 
-// NewProtoBinaryCodec returns a new AvroBinaryCodec instance.
-func NewProtoBinaryCodec(schemaDefinition string) *ProtoBinaryCodec {
-	return &ProtoBinaryCodec{
-		schemaDefinition: schemaDefinition,
-	}
+// NewProtoBinaryCodec returns a new ProtoBinaryCodec instance.
+func NewProtoBinaryCodec() *ProtoBinaryCodec {
+	return &ProtoBinaryCodec{}
 }
 
 // Encode encodes in protobuf binary format the provided input.
@@ -55,15 +52,11 @@ func (c *ProtoBinaryCodec) Decode(enc []byte, out any) error {
 }
 
 // ProtoJsonCodec is a Codec implementation for encoding and decoding with protobuf schema in json format.
-type ProtoJsonCodec struct {
-	schemaDefinition string
-}
+type ProtoJsonCodec struct{}
 
-// NewProtoJsonCodec returns a new AvroBinaryCodec instance.
-func NewProtoJsonCodec(schemaDefinition string) *ProtoJsonCodec {
-	return &ProtoJsonCodec{
-		schemaDefinition: schemaDefinition,
-	}
+// NewProtoJsonCodec returns a new ProtoJsonCodec instance.
+func NewProtoJsonCodec() *ProtoJsonCodec {
+	return &ProtoJsonCodec{}
 }
 
 // Encode encodes in protobuf json format.

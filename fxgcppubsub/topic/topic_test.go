@@ -106,7 +106,9 @@ func TestTopic(t *testing.T) {
 	})
 
 	t.Run("avro message", func(t *testing.T) {
-		cod := codec.NewAvroBinaryCodec(avroSchemaDefinition)
+		cod, err := codec.NewAvroBinaryCodec(avroSchemaDefinition)
+		assert.NoError(t, err)
+
 		baseTop := client.Topic("avro-topic")
 		top := topic.NewTopic(cod, baseTop)
 
@@ -142,7 +144,7 @@ func TestTopic(t *testing.T) {
 	})
 
 	t.Run("proto message", func(t *testing.T) {
-		cod := codec.NewProtoBinaryCodec(protoSchemaDefinition)
+		cod := codec.NewProtoBinaryCodec()
 		baseTop := client.Topic("proto-topic")
 		top := topic.NewTopic(cod, baseTop)
 
