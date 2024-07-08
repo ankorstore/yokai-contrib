@@ -369,7 +369,7 @@ In `test` mode:
 
 are all configured to work against a [pstest.Server](https://pkg.go.dev/cloud.google.com/go/pubsub@v1.40.0/pstest), avoiding the need to spin up any `Pub/Sub` real (or emulator) instance, for better tests portability.
 
-This means you can create `topics`, `subscriptions` and `schemas` locally for your tests without impacting any `Pub/Sub` instance.
+You can create `topics`, `subscriptions` and `schemas` locally only for your tests.
 
 For example:
 
