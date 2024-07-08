@@ -415,17 +415,13 @@ func TestPubSub(t *testing.T) {
 	)
 	
 	// publish to test-topic
-	res, err := publisher.Publish(ctx, "test-topic", []byte("test data"))
+	_, err := publisher.Publish(ctx, "test-topic", []byte("test data"))
 	assert.NotNil(t, res)
 	assert.NoError(t, err)
 
-	sid, err := res.Get(ctx)
-	assert.NotEmpty(t, sid)
-	assert.NoError(t, err)
-	
+	// subscribe from test-subscription
 	waiter := supervisor.StartAckWaiter("test-subscription")
 	
-	// subscribe from test-subscription
 	go subscriber.Subscribe(ctx, "test-subscription", func(ctx context.Context, m *message.Message) {
 		assert.Equal(t, []byte("test data"), m.Data())
 
