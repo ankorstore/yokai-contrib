@@ -26,9 +26,9 @@
 
 ## Overview
 
-This module provides to your [Yokai](https://github.com/ankorstore/yokai) application the possibility to `publish` and/or `subscribe` on a `GCP Pub/Sub` instance.
+This module provides to your [Yokai](https://github.com/ankorstore/yokai) application the possibility to `publish` and/or `subscribe` on a [GCP Pub/Sub](https://cloud.google.com/pubsub) instance.
 
-It also provides the support of [Avro](https://avro.apache.org/) and [Protobuf](https://protobuf.dev/) schemas if needed.
+It also provides the support of [Avro](https://avro.apache.org/) and [Protobuf](https://protobuf.dev/) schemas.
 
 ## Installation
 
@@ -62,11 +62,6 @@ Configuration reference:
 
 ```yaml
 # ./configs/config.yaml
-app:
-  name: app
-  env: dev
-  version: 0.1.0
-  debug: true
 modules:
   gcppubsub:
     project:
@@ -131,16 +126,16 @@ To publish a message on a topic associated to this avro schema:
 ```go
 // struct with tags, representing the message
 type SimpleRecord struct {
-StringField  string  `avro:"StringField" json:"StringField"`
-FloatField   float32 `avro:"FloatField" json:"FloatField"`
-BooleanField bool    `avro:"BooleanField" json:"BooleanField"`
+    StringField  string  `avro:"StringField" json:"StringField"`
+    FloatField   float32 `avro:"FloatField" json:"FloatField"`
+    BooleanField bool    `avro:"BooleanField" json:"BooleanField"`
 }
 
 // publish on projects/${GCP_PROJECT_ID}/topics/some-topic
 res, err := publisher.Publish(context.Backgound(), "some-topic", &SimpleRecord{
-StringField:  "some string",
-FloatField:   12.34,
-BooleanField: true,
+    StringField:  "some string",
+    FloatField:   12.34,
+    BooleanField: true,
 })
 ```
 
@@ -158,9 +153,9 @@ package simple;
 option go_package = "github.com/ankorstore/yokai-contrib/fxgcppubsub/testdata/proto";
 
 message SimpleRecord {
-  string string_field = 1;
-  float float_field = 2;
-  bool boolean_field = 3;
+    string string_field = 1;
+    float float_field = 2;
+    bool boolean_field = 3;
 }
 ```
 
@@ -169,20 +164,20 @@ To publish a message on a topic associated to this protobuf schema:
 ```go
 // generated protobuf stub proto.Message, representing the message
 type SimpleRecord struct {
-state         protoimpl.MessageState
-sizeCache     protoimpl.SizeCache
-unknownFields protoimpl.UnknownFields
-
-StringField  string  `protobuf:"bytes,1,opt,name=string_field,json=stringField,proto3" json:"string_field,omitempty"`
-FloatField   float32 `protobuf:"fixed32,2,opt,name=float_field,json=floatField,proto3" json:"float_field,omitempty"`
-BooleanField bool    `protobuf:"varint,3,opt,name=boolean_field,json=booleanField,proto3" json:"boolean_field,omitempty"`
+    state         protoimpl.MessageState
+    sizeCache     protoimpl.SizeCache
+    unknownFields protoimpl.UnknownFields
+    
+    StringField  string  `protobuf:"bytes,1,opt,name=string_field,json=stringField,proto3" json:"string_field,omitempty"`
+    FloatField   float32 `protobuf:"fixed32,2,opt,name=float_field,json=floatField,proto3" json:"float_field,omitempty"`
+    BooleanField bool    `protobuf:"varint,3,opt,name=boolean_field,json=booleanField,proto3" json:"boolean_field,omitempty"`
 }
 
 // publish on projects/${GCP_PROJECT_ID}/topics/some-topic
 res, err := publisher.Publish(context.Backgound(), "some-topic", &SimpleRecord{
-StringField:  "test proto",
-FloatField:   56.78,
-BooleanField: false,
+    StringField:  "test proto",
+    FloatField:   56.78,
+    BooleanField: false,
 })
 ```
 
@@ -201,9 +196,9 @@ To subscribe on a subscription receiving raw messages (without associated schema
 ```go
 // subscribe from projects/${GCP_PROJECT_ID}/subscriptions/some-subscription
 err := subscriber.Subscribe(ctx, "some-subscription", func(ctx context.Context, m *message.Message) {
-fmt.Printf("%s", m.Data())
-
-m.Ack()
+    fmt.Printf("%s", m.Data())
+    
+    m.Ack()
 })
 ```
 
@@ -243,23 +238,23 @@ To subscribe from a subscription associated to this avro schema:
 ```go
 // struct with tags, representing the message
 type SimpleRecord struct {
-StringField  string  `avro:"StringField" json:"StringField"`
-FloatField   float32 `avro:"FloatField" json:"FloatField"`
-BooleanField bool    `avro:"BooleanField" json:"BooleanField"`
+    StringField  string  `avro:"StringField" json:"StringField"`
+    FloatField   float32 `avro:"FloatField" json:"FloatField"`
+    BooleanField bool    `avro:"BooleanField" json:"BooleanField"`
 }
 
 // subscribe from projects/${GCP_PROJECT_ID}/subscriptions/some-subscription
 err := subscriber.Subscribe(ctx, "some-subscription", func(ctx context.Context, m *message.Message) {
-var rec SimpleRecord
-
-err = m.Decode(&rec)
-if err != nil {
-m.Nack()
-}
-
-fmt.Printf("%v", rec)
-
-m.Ack()
+    var rec SimpleRecord
+    
+    err = m.Decode(&rec)
+    if err != nil {
+        m.Nack()
+    }
+    
+    fmt.Printf("%v", rec)
+    
+    m.Ack()
 })
 ```
 
@@ -288,27 +283,27 @@ To subscribe from a subscription associated to this protobuf schema:
 ```go
 // generated protobuf stub proto.Message, representing the message
 type SimpleRecord struct {
-state         protoimpl.MessageState
-sizeCache     protoimpl.SizeCache
-unknownFields protoimpl.UnknownFields
-
-StringField  string  `protobuf:"bytes,1,opt,name=string_field,json=stringField,proto3" json:"string_field,omitempty"`
-FloatField   float32 `protobuf:"fixed32,2,opt,name=float_field,json=floatField,proto3" json:"float_field,omitempty"`
-BooleanField bool    `protobuf:"varint,3,opt,name=boolean_field,json=booleanField,proto3" json:"boolean_field,omitempty"`
+    state         protoimpl.MessageState
+    sizeCache     protoimpl.SizeCache
+    unknownFields protoimpl.UnknownFields
+    
+    StringField  string  `protobuf:"bytes,1,opt,name=string_field,json=stringField,proto3" json:"string_field,omitempty"`
+    FloatField   float32 `protobuf:"fixed32,2,opt,name=float_field,json=floatField,proto3" json:"float_field,omitempty"`
+    BooleanField bool    `protobuf:"varint,3,opt,name=boolean_field,json=booleanField,proto3" json:"boolean_field,omitempty"`
 }
 
 // subscribe from projects/${GCP_PROJECT_ID}/subscriptions/some-subscription
 err := subscriber.Subscribe(ctx, "some-subscription", func(ctx context.Context, m *message.Message) {
-var rec SimpleRecord
-
-err = m.Decode(&rec)
-if err != nil {
-m.Nack()
-}
-
-fmt.Printf("%v", rec)
-
-m.Ack()
+    var rec SimpleRecord
+    
+    err = m.Decode(&rec)
+    if err != nil {
+        m.Nack()
+    }
+    
+    fmt.Printf("%v", rec)
+    
+    m.Ack()
 })
 ```
 
