@@ -50,7 +50,7 @@ func TestDefaultTopicRegistry(t *testing.T) {
 		baseSub := client.Topic("test-topic")
 
 		top := topic.NewTopic(
-			codec.NewDefaultCodec(pubsub.SchemaTypeUnspecified, pubsub.EncodingUnspecified, ""),
+			codec.NewRawCodec(),
 			baseSub,
 		)
 

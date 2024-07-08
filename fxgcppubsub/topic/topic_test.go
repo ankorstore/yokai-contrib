@@ -68,7 +68,7 @@ func TestTopic(t *testing.T) {
 	).RequireStart().RequireStop()
 
 	t.Run("getters", func(t *testing.T) {
-		cod := codec.NewDefaultCodec(pubsub.SchemaTypeUnspecified, pubsub.EncodingUnspecified, "")
+		cod := codec.NewRawCodec()
 		baseTop := client.Topic("raw-topic")
 		top := topic.NewTopic(cod, baseTop)
 
@@ -77,7 +77,7 @@ func TestTopic(t *testing.T) {
 	})
 
 	t.Run("raw message", func(t *testing.T) {
-		cod := codec.NewDefaultCodec(pubsub.SchemaTypeUnspecified, pubsub.EncodingUnspecified, "")
+		cod := codec.NewRawCodec()
 		baseTop := client.Topic("raw-topic")
 		top := topic.NewTopic(cod, baseTop)
 
@@ -106,7 +106,7 @@ func TestTopic(t *testing.T) {
 	})
 
 	t.Run("avro message", func(t *testing.T) {
-		cod := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingBinary, avroSchemaDefinition)
+		cod := codec.NewAvroBinaryCodec(avroSchemaDefinition)
 		baseTop := client.Topic("avro-topic")
 		top := topic.NewTopic(cod, baseTop)
 
@@ -142,7 +142,7 @@ func TestTopic(t *testing.T) {
 	})
 
 	t.Run("proto message", func(t *testing.T) {
-		cod := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingBinary, protoSchemaDefinition)
+		cod := codec.NewProtoBinaryCodec(protoSchemaDefinition)
 		baseTop := client.Topic("proto-topic")
 		top := topic.NewTopic(cod, baseTop)
 

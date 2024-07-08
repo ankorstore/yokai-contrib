@@ -16,7 +16,7 @@ func TestMessage(t *testing.T) {
 		t.Parallel()
 
 		baseMsg := createTestBaseMessage()
-		cod := codec.NewDefaultCodec(pubsub.SchemaTypeUnspecified, pubsub.EncodingUnspecified, "")
+		cod := codec.NewRawCodec()
 
 		msg := message.NewMessage(cod, baseMsg)
 
@@ -32,7 +32,7 @@ func TestMessage(t *testing.T) {
 		t.Parallel()
 
 		baseMsg := createTestBaseMessage()
-		cod := codec.NewDefaultCodec(pubsub.SchemaTypeUnspecified, pubsub.EncodingUnspecified, "")
+		cod := codec.NewRawCodec()
 
 		msg := message.NewMessage(cod, baseMsg)
 

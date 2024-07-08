@@ -59,8 +59,11 @@ func (f *DefaultTopicFactory) Create(ctx context.Context, topicID string) (*Topi
 		topicSchemaDefinition = topicSchemaConfig.Definition
 	}
 
-	return NewTopic(
-		f.factory.Create(topicSchemaType, topicSchemaEncoding, topicSchemaDefinition),
-		topic,
-	), nil
+	// topic codec
+	topicCodec, err := f.factory.Create(topicSchemaType, topicSchemaEncoding, topicSchemaDefinition)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create topic codec: %w", err)
+	}
+
+	return NewTopic(topicCodec, topic), nil
 }

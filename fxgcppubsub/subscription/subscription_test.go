@@ -68,7 +68,7 @@ func TestSubscription(t *testing.T) {
 	).RequireStart().RequireStop()
 
 	t.Run("getters", func(t *testing.T) {
-		cod := codec.NewDefaultCodec(pubsub.SchemaTypeUnspecified, pubsub.EncodingUnspecified, "")
+		cod := codec.NewRawCodec()
 		baseSub := client.Subscription("raw-subscription")
 		sub := subscription.NewSubscription(cod, baseSub)
 
@@ -77,7 +77,7 @@ func TestSubscription(t *testing.T) {
 	})
 
 	t.Run("raw message", func(t *testing.T) {
-		cod := codec.NewDefaultCodec(pubsub.SchemaTypeUnspecified, pubsub.EncodingUnspecified, "")
+		cod := codec.NewRawCodec()
 		baseSub := client.Subscription("raw-subscription")
 		sub := subscription.NewSubscription(cod, baseSub)
 
@@ -107,7 +107,7 @@ func TestSubscription(t *testing.T) {
 	})
 
 	t.Run("avro message", func(t *testing.T) {
-		cod := codec.NewDefaultCodec(pubsub.SchemaAvro, pubsub.EncodingBinary, avroSchemaDefinition)
+		cod := codec.NewAvroBinaryCodec(avroSchemaDefinition)
 		baseSub := client.Subscription("avro-subscription")
 		sub := subscription.NewSubscription(cod, baseSub)
 
@@ -144,7 +144,7 @@ func TestSubscription(t *testing.T) {
 	})
 
 	t.Run("proto message", func(t *testing.T) {
-		cod := codec.NewDefaultCodec(pubsub.SchemaProtocolBuffer, pubsub.EncodingBinary, protoSchemaDefinition)
+		cod := codec.NewProtoBinaryCodec(protoSchemaDefinition)
 		baseSub := client.Subscription("proto-subscription")
 		sub := subscription.NewSubscription(cod, baseSub)
 

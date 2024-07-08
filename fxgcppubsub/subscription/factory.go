@@ -65,8 +65,11 @@ func (f *DefaultSubscriptionFactory) Create(ctx context.Context, subscriptionID 
 		topicSchemaDefinition = topicSchemaConfig.Definition
 	}
 
-	return NewSubscription(
-		f.factory.Create(topicSchemaType, topicSchemaEncoding, topicSchemaDefinition),
-		subscription,
-	), nil
+	// subscription codec
+	subscriptionCodec, err := f.factory.Create(topicSchemaType, topicSchemaEncoding, topicSchemaDefinition)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create subscription codec: %w", err)
+	}
+
+	return NewSubscription(subscriptionCodec, subscription), nil
 }

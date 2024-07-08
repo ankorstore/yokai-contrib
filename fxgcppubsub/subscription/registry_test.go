@@ -51,7 +51,7 @@ func TestDefaultSubscriptionRegistry(t *testing.T) {
 		baseSub := client.Subscription("test-subscription")
 
 		sub := subscription.NewSubscription(
-			codec.NewDefaultCodec(pubsub.SchemaTypeUnspecified, pubsub.EncodingUnspecified, ""),
+			codec.NewRawCodec(),
 			baseSub,
 		)
 
