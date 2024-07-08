@@ -75,7 +75,7 @@ modules:
 
 ## Publish
 
-This module provides a high level [Publisher](publisher.go) that you can use to `publish` messages on a `topic`, that you can inject anywhere.
+This module provides a high level [Publisher](publisher.go) that you can inject anywhere to `publish` messages on a `topic`.
 
 If the `topic` is associated to an `avro` or `protobuf` schema, the publisher will automatically handle the message encoding.
 
@@ -183,7 +183,7 @@ res, err := publisher.Publish(context.Backgound(), "some-topic", &SimpleRecord{
 
 ## Subscribe
 
-This module provides a high level [Subscriber](subscriber.go) that you can use to `subscribe` messages from a `subscription`, that you can inject anywhere.
+This module provides a high level [Subscriber](subscriber.go) that you can inject anywhere to `subscribe` messages from a `subscription`.
 
 If the subscription's `topic` is associated to an `avro` or `protobuf` schema, the subscriber will offer a message from which you can handle the decoding.
 
