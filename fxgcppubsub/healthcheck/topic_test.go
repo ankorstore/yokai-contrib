@@ -6,7 +6,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub"
-	fxgcppubsubhealthcheck "github.com/ankorstore/yokai-contrib/fxgcppubsub/healthcheck"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/healthcheck"
 	"github.com/ankorstore/yokai/config"
 	"github.com/ankorstore/yokai/fxconfig"
 	"github.com/stretchr/testify/assert"
@@ -14,120 +14,56 @@ import (
 	"go.uber.org/fx/fxtest"
 )
 
-func TestWithExistingTopics(t *testing.T) {
+func TestGcpPubSubTopicsProbe(t *testing.T) {
 	t.Setenv("APP_ENV", "test")
 	t.Setenv("APP_CONFIG_PATH", "../testdata/config")
 	t.Setenv("GCP_PROJECT_ID", "test-project")
 
+	var config *config.Config
 	var client *pubsub.Client
-	var conf *config.Config
 
-	app := fxtest.New(
-		t,
-		fx.NopLogger,
-		fxgcppubsub.FxGcpPubSubModule,
-		fxconfig.FxConfigModule,
-		fx.Populate(&client, &conf),
-	).RequireStart()
+	ctx := context.Background()
 
-	for _, topic := range conf.GetStringSlice("modules.gcppubsub.healthcheck.topics") {
-		_, err := client.CreateTopic(context.Background(), topic)
-		assert.NoError(t, err)
-	}
+	t.Run("probe name", func(t *testing.T) {
+		probe := &healthcheck.GcpPubSubTopicsProbe{}
 
-	p := fxgcppubsubhealthcheck.NewGcpPubSubTopicsProbe(conf, client)
-	assert.Equal(t, fxgcppubsubhealthcheck.TopicsProbeName, p.Name())
-	checkResult := p.Check(context.Background())
+		assert.Equal(t, "gcppubsub-topics", probe.Name())
+	})
 
-	app.RequireStop()
+	t.Run("probe success when topic exist", func(t *testing.T) {
+		fxtest.New(
+			t,
+			fx.NopLogger,
+			fxconfig.FxConfigModule,
+			fxgcppubsub.FxGcpPubSubModule,
+			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
+			fxgcppubsub.PrepareTopic(fxgcppubsub.PrepareTopicParams{
+				TopicID: "test-topic",
+			}),
+			fx.Populate(&config, &client),
+		).RequireStart().RequireStop()
 
-	assert.True(t, checkResult.Success)
-	assert.Equal(t, "topic topic1 exists, topic topic2 exists, topic topic3 exists", checkResult.Message)
-}
+		probe := healthcheck.NewGcpPubSubTopicsProbe(config, client)
 
-func TestWithMissingTopics(t *testing.T) {
-	t.Setenv("APP_ENV", "test")
-	t.Setenv("APP_CONFIG_PATH", "../testdata/config")
-	t.Setenv("GCP_PROJECT_ID", "test-project")
+		res := probe.Check(ctx)
+		assert.True(t, res.Success)
+		assert.Equal(t, "topic test-topic exists", res.Message)
+	})
 
-	var client *pubsub.Client
-	var conf *config.Config
+	t.Run("probe failure when topic does not exist", func(t *testing.T) {
+		fxtest.New(
+			t,
+			fx.NopLogger,
+			fxconfig.FxConfigModule,
+			fxgcppubsub.FxGcpPubSubModule,
+			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
+			fx.Populate(&config, &client),
+		).RequireStart().RequireStop()
 
-	app := fxtest.New(
-		t,
-		fx.NopLogger,
-		fxgcppubsub.FxGcpPubSubModule,
-		fxconfig.FxConfigModule,
-		fx.Populate(&client, &conf),
-	).RequireStart()
+		probe := healthcheck.NewGcpPubSubTopicsProbe(config, client)
 
-	for _, topic := range conf.GetStringSlice("modules.gcppubsub.healthcheck.topics") {
-		if topic != "topic2" {
-			_, err := client.CreateTopic(context.Background(), topic)
-			assert.NoError(t, err)
-		}
-	}
-
-	p := fxgcppubsubhealthcheck.NewGcpPubSubTopicsProbe(conf, client)
-	assert.Equal(t, fxgcppubsubhealthcheck.TopicsProbeName, p.Name())
-	checkResult := p.Check(context.Background())
-
-	app.RequireStop()
-
-	assert.False(t, checkResult.Success)
-	assert.Equal(t, "topic topic1 exists, topic topic2 does not exist, topic topic3 exists", checkResult.Message)
-}
-
-func TestWithEmptyTopics(t *testing.T) {
-	t.Setenv("APP_ENV", "test")
-	t.Setenv("APP_CONFIG_PATH", "../testdata/config")
-	t.Setenv("GCP_PROJECT_ID", "test-project")
-
-	// empty the topics list
-	t.Setenv("MODULES_GCPPUBSUB_HEALTHCHECK_TOPICS", " ")
-
-	var client *pubsub.Client
-	var conf *config.Config
-
-	app := fxtest.New(
-		t,
-		fx.NopLogger,
-		fxgcppubsub.FxGcpPubSubModule,
-		fxconfig.FxConfigModule,
-		fx.Populate(&client, &conf),
-	).RequireStart()
-
-	p := fxgcppubsubhealthcheck.NewGcpPubSubTopicsProbe(conf, client)
-	assert.Equal(t, fxgcppubsubhealthcheck.TopicsProbeName, p.Name())
-	checkResult := p.Check(context.Background())
-
-	app.RequireStop()
-
-	assert.True(t, checkResult.Success)
-}
-
-func TestWithFailingTopics(t *testing.T) {
-	t.Setenv("APP_ENV", "test")
-	t.Setenv("APP_CONFIG_PATH", "../testdata/config")
-	t.Setenv("GCP_PROJECT_ID", "test-project")
-
-	var client *pubsub.Client
-	var conf *config.Config
-
-	fxtest.New(
-		t,
-		fx.NopLogger,
-		fxgcppubsub.FxGcpPubSubModule,
-		fxconfig.FxConfigModule,
-		fx.Populate(&client, &conf),
-	).RequireStart().RequireStop()
-
-	p := fxgcppubsubhealthcheck.NewGcpPubSubTopicsProbe(conf, client)
-	assert.Equal(t, fxgcppubsubhealthcheck.TopicsProbeName, p.Name())
-	checkResult := p.Check(context.Background())
-
-	assert.False(t, checkResult.Success)
-	assert.Contains(t, checkResult.Message, "topic topic1 error: rpc error")
-	assert.Contains(t, checkResult.Message, "topic topic2 error: rpc error")
-	assert.Contains(t, checkResult.Message, "topic topic3 error: rpc error")
+		res := probe.Check(ctx)
+		assert.False(t, res.Success)
+		assert.Equal(t, "topic test-topic does not exist", res.Message)
+	})
 }

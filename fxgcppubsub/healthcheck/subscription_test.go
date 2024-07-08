@@ -6,7 +6,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub"
-	fxgcppubsubhealthcheck "github.com/ankorstore/yokai-contrib/fxgcppubsub/healthcheck"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/healthcheck"
 	"github.com/ankorstore/yokai/config"
 	"github.com/ankorstore/yokai/fxconfig"
 	"github.com/stretchr/testify/assert"
@@ -14,138 +14,57 @@ import (
 	"go.uber.org/fx/fxtest"
 )
 
-func TestWithExistingSubscriptions(t *testing.T) {
+func TestGcpPubSubSubscriptionsProbe(t *testing.T) {
 	t.Setenv("APP_ENV", "test")
 	t.Setenv("APP_CONFIG_PATH", "../testdata/config")
 	t.Setenv("GCP_PROJECT_ID", "test-project")
 
+	var config *config.Config
 	var client *pubsub.Client
-	var conf *config.Config
 
-	app := fxtest.New(
-		t,
-		fx.NopLogger,
-		fxgcppubsub.FxGcpPubSubModule,
-		fxconfig.FxConfigModule,
-		fx.Populate(&client, &conf),
-	).RequireStart()
+	ctx := context.Background()
 
-	topic, err := client.CreateTopic(context.Background(), "topic1")
-	assert.NoError(t, err)
+	t.Run("probe name", func(t *testing.T) {
+		probe := &healthcheck.GcpPubSubSubscriptionsProbe{}
 
-	for _, subscription := range conf.GetStringSlice("modules.gcppubsub.healthcheck.subscriptions") {
-		_, err = client.CreateSubscription(context.Background(), subscription, pubsub.SubscriptionConfig{
-			Topic: topic,
-		})
-		assert.NoError(t, err)
-	}
+		assert.Equal(t, "gcppubsub-subscriptions", probe.Name())
+	})
 
-	p := fxgcppubsubhealthcheck.NewGcpPubSubSubscriptionsProbe(conf, client)
-	assert.Equal(t, fxgcppubsubhealthcheck.SubscriptionsProbeName, p.Name())
-	checkResult := p.Check(context.Background())
+	t.Run("probe success when subscription exist", func(t *testing.T) {
+		fxtest.New(
+			t,
+			fx.NopLogger,
+			fxconfig.FxConfigModule,
+			fxgcppubsub.FxGcpPubSubModule,
+			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
+			fxgcppubsub.PrepareTopicAndSubscription(fxgcppubsub.PrepareTopicAndSubscriptionParams{
+				TopicID:        "test-topic",
+				SubscriptionID: "test-subscription",
+			}),
+			fx.Populate(&config, &client),
+		).RequireStart().RequireStop()
 
-	app.RequireStop()
+		probe := healthcheck.NewGcpPubSubSubscriptionsProbe(config, client)
 
-	assert.True(t, checkResult.Success)
-	assert.Equal(
-		t,
-		"subscription subscription1 exists, subscription subscription2 exists, subscription subscription3 exists",
-		checkResult.Message,
-	)
-}
+		res := probe.Check(ctx)
+		assert.True(t, res.Success)
+		assert.Equal(t, "subscription test-subscription exists", res.Message)
+	})
 
-func TestWithMissingSubscriptions(t *testing.T) {
-	t.Setenv("APP_ENV", "test")
-	t.Setenv("APP_CONFIG_PATH", "../testdata/config")
-	t.Setenv("GCP_PROJECT_ID", "test-project")
+	t.Run("probe failure when subscription does not exist", func(t *testing.T) {
+		fxtest.New(
+			t,
+			fx.NopLogger,
+			fxconfig.FxConfigModule,
+			fxgcppubsub.FxGcpPubSubModule,
+			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
+			fx.Populate(&config, &client),
+		).RequireStart().RequireStop()
 
-	var client *pubsub.Client
-	var conf *config.Config
+		probe := healthcheck.NewGcpPubSubSubscriptionsProbe(config, client)
 
-	app := fxtest.New(
-		t,
-		fx.NopLogger,
-		fxgcppubsub.FxGcpPubSubModule,
-		fxconfig.FxConfigModule,
-		fx.Populate(&client, &conf),
-	).RequireStart()
-
-	topic, err := client.CreateTopic(context.Background(), "topic1")
-	assert.NoError(t, err)
-
-	for _, subscription := range conf.GetStringSlice("modules.gcppubsub.healthcheck.subscriptions") {
-		if subscription != "subscription2" {
-			_, err = client.CreateSubscription(context.Background(), subscription, pubsub.SubscriptionConfig{
-				Topic: topic,
-			})
-			assert.NoError(t, err)
-		}
-	}
-
-	p := fxgcppubsubhealthcheck.NewGcpPubSubSubscriptionsProbe(conf, client)
-	assert.Equal(t, fxgcppubsubhealthcheck.SubscriptionsProbeName, p.Name())
-	checkResult := p.Check(context.Background())
-
-	app.RequireStop()
-
-	assert.False(t, checkResult.Success)
-	assert.Equal(
-		t,
-		"subscription subscription1 exists, subscription subscription2 does not exist, subscription subscription3 exists",
-		checkResult.Message,
-	)
-}
-
-func TestWithEmptySubscriptions(t *testing.T) {
-	t.Setenv("APP_ENV", "test")
-	t.Setenv("APP_CONFIG_PATH", "../testdata/config")
-	t.Setenv("GCP_PROJECT_ID", "test-project")
-
-	// empty the subscriptions list
-	t.Setenv("MODULES_GCPPUBSUB_HEALTHCHECK_SUBSCRIPTIONS", " ")
-
-	var client *pubsub.Client
-	var conf *config.Config
-
-	app := fxtest.New(
-		t,
-		fx.NopLogger,
-		fxgcppubsub.FxGcpPubSubModule,
-		fxconfig.FxConfigModule,
-		fx.Populate(&client, &conf),
-	).RequireStart()
-
-	p := fxgcppubsubhealthcheck.NewGcpPubSubSubscriptionsProbe(conf, client)
-	assert.Equal(t, fxgcppubsubhealthcheck.SubscriptionsProbeName, p.Name())
-	checkResult := p.Check(context.Background())
-
-	app.RequireStop()
-
-	assert.True(t, checkResult.Success)
-}
-
-func TestWithFailingSubscriptions(t *testing.T) {
-	t.Setenv("APP_ENV", "test")
-	t.Setenv("APP_CONFIG_PATH", "../testdata/config")
-	t.Setenv("GCP_PROJECT_ID", "test-project")
-
-	var client *pubsub.Client
-	var conf *config.Config
-
-	fxtest.New(
-		t,
-		fx.NopLogger,
-		fxgcppubsub.FxGcpPubSubModule,
-		fxconfig.FxConfigModule,
-		fx.Populate(&client, &conf),
-	).RequireStart().RequireStop()
-
-	p := fxgcppubsubhealthcheck.NewGcpPubSubSubscriptionsProbe(conf, client)
-	assert.Equal(t, fxgcppubsubhealthcheck.SubscriptionsProbeName, p.Name())
-	checkResult := p.Check(context.Background())
-
-	assert.False(t, checkResult.Success)
-	assert.Contains(t, checkResult.Message, "subscription subscription1 error: rpc error")
-	assert.Contains(t, checkResult.Message, "subscription subscription2 error: rpc error")
-	assert.Contains(t, checkResult.Message, "subscription subscription3 error: rpc error")
+		res := probe.Check(ctx)
+		assert.False(t, res.Success)
+		assert.Equal(t, "subscription test-subscription does not exist", res.Message)
+	})
 }

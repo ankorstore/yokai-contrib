@@ -1,0 +1,19 @@
+{
+  "namespace": "Simple",
+  "type": "record",
+  "name": "Avro",
+  "fields": [
+    {
+      "name": "StringField",
+      "type": "string"
+    },
+    {
+      "name": "FloatField",
+      "type": "float"
+    },
+    {
+      "name": "BooleanField",
+      "type": "boolean"
+    }
+  ]
+}

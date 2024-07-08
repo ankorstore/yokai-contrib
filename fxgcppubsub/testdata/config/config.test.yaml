@@ -4,3 +4,9 @@ modules:
   log:
     level: debug
     output: test
+  gcppubsub:
+    healthcheck:
+      topics:
+        - test-topic
+      subscriptions:
+        - test-subscription
