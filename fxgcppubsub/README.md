@@ -416,7 +416,6 @@ func TestPubSub(t *testing.T) {
 	
 	// publish to test-topic
 	_, err := publisher.Publish(ctx, "test-topic", []byte("test data"))
-	assert.NotNil(t, res)
 	assert.NoError(t, err)
 
 	// subscribe from test-subscription
