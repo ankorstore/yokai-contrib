@@ -392,7 +392,7 @@ import (
 	"go.uber.org/fx/fxtest"
 )
 
-func TestRawMessage(t *testing.T) {
+func TestPubSub(t *testing.T) {
 	t.Setenv("APP_ENV", "test")
 	t.Setenv("APP_CONFIG_PATH", "testdata/config")
 	t.Setenv("GCP_PROJECT_ID", "test-project")
