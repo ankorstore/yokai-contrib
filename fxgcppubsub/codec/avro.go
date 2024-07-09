@@ -23,7 +23,7 @@ type AvroBinaryCodec struct {
 func NewAvroBinaryCodec(schemaDefinition string) (*AvroBinaryCodec, error) {
 	api := avro.Config{}.Freeze()
 
-	schema, err := avro.Parse(schemaDefinition)
+	schema, err := avro.ParseBytesWithCache([]byte(schemaDefinition), "", &avro.SchemaCache{})
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse avro schema: %w", err)
 	}
