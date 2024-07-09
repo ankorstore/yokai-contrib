@@ -15,15 +15,18 @@ var (
 
 // AvroBinaryCodec is a Codec implementation for encoding and decoding with avro schema in binary format.
 type AvroBinaryCodec struct {
+	cache  *avro.SchemaCache
 	api    avro.API
 	schema avro.Schema
 }
 
 // NewAvroBinaryCodec returns a new AvroBinaryCodec instance.
 func NewAvroBinaryCodec(schemaDefinition string) (*AvroBinaryCodec, error) {
+	cache := &avro.SchemaCache{}
+
 	api := avro.Config{}.Freeze()
 
-	schema, err := avro.Parse(schemaDefinition)
+	schema, err := avro.ParseBytesWithCache([]byte(schemaDefinition), "", cache)
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse avro schema: %w", err)
 	}
