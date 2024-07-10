@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/ankorstore/yokai-contrib/compare/fxgcppubsub/v1.3.0...fxgcppubsub/v1.3.1) (2024-07-09)
+
+
+### Bug Fixes
+
+* **fxgcppubsub:** Fixed race conditions on avro binary codec cache ([#20](https://github.com/ankorstore/yokai-contrib/issues/20)) ([6cf94fc](https://github.com/ankorstore/yokai-contrib/commit/6cf94fc822d3859d81e3db04e7b47a34d20c3acd))
+
 ## [1.3.0](https://github.com/ankorstore/yokai-contrib/compare/fxgcppubsub/v1.2.0...fxgcppubsub/v1.3.0) (2024-07-08)
 
 
