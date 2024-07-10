@@ -20,6 +20,7 @@ func NewAckReactor(supervisor AckSupervisor) *AckReactor {
 func (r *AckReactor) FuncNames() []string {
 	return []string{
 		"Acknowledge",
+		"ModifyAckDeadline",
 	}
 }
 
@@ -27,6 +28,10 @@ func (r *AckReactor) FuncNames() []string {
 func (r *AckReactor) React(req any) (bool, any, error) {
 	if ackReq, ok := req.(*pubsubpb.AcknowledgeRequest); ok {
 		r.supervisor.StopAckWaiter(ackReq.Subscription, ackReq.AckIds, nil)
+	}
+
+	if ackReq, ok := req.(*pubsubpb.ModifyAckDeadlineRequest); ok {
+		r.supervisor.StopNackWaiter(ackReq.Subscription, ackReq.AckIds, nil)
 	}
 
 	return false, nil, nil

@@ -68,4 +68,41 @@ func TestAckSupervisor(t *testing.T) {
 		assert.Equal(t, assert.AnError, err)
 		assert.Equal(t, []string{"test-id"}, data)
 	})
+
+	t.Run("wait for nack", func(t *testing.T) {
+		waiter := supervisor.StartNackWaiter("test-subscription")
+
+		go func() {
+			time.Sleep(1 * time.Millisecond)
+
+			supervisor.StopNackWaiter(
+				subscription.NormalizeSubscriptionName("test-project", "test-subscription"),
+				[]string{"test-id"},
+				nil,
+			)
+		}()
+
+		data, err := waiter.WaitMaxDuration(context.Background(), 5*time.Millisecond)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"test-id"}, data)
+	})
+
+	t.Run("wait for nack with error", func(t *testing.T) {
+		waiter := supervisor.StartNackWaiter("test-subscription")
+
+		go func() {
+			time.Sleep(1 * time.Millisecond)
+
+			supervisor.StopNackWaiter(
+				subscription.NormalizeSubscriptionName("test-project", "test-subscription"),
+				[]string{"test-id"},
+				assert.AnError,
+			)
+		}()
+
+		data, err := waiter.WaitMaxDuration(context.Background(), 5*time.Millisecond)
+		assert.Error(t, err)
+		assert.Equal(t, assert.AnError, err)
+		assert.Equal(t, []string{"test-id"}, data)
+	})
 }
