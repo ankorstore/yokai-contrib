@@ -1,6 +1,7 @@
 package reactor
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -32,6 +33,8 @@ func (s *DefaultWaiterSupervisor) StartWaiter(target string) *Waiter {
 
 	waiter := NewWaiter()
 
+	fmt.Printf("start waiter for target %s\n", target)
+
 	s.waiters[target] = waiter
 
 	return waiter
@@ -41,6 +44,8 @@ func (s *DefaultWaiterSupervisor) StartWaiter(target string) *Waiter {
 func (s *DefaultWaiterSupervisor) StopWaiter(target string, data any, err error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
+
+	fmt.Printf("stop waiter for target %s\n", target)
 
 	if waiter, found := s.waiters[target]; found {
 		waiter.Stop(data, err)
