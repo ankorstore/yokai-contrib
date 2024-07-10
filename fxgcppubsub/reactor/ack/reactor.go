@@ -30,8 +30,8 @@ func (r *AckReactor) React(req any) (bool, any, error) {
 		r.supervisor.StopAckWaiter(ackReq.Subscription, ackReq.AckIds, nil)
 	}
 
-	if ackReq, ok := req.(*pubsubpb.ModifyAckDeadlineRequest); ok {
-		r.supervisor.StopNackWaiter(ackReq.Subscription, ackReq.AckIds, nil)
+	if modReq, ok := req.(*pubsubpb.ModifyAckDeadlineRequest); ok {
+		r.supervisor.StopNackWaiter(modReq.Subscription, modReq.AckIds, nil)
 	}
 
 	return false, nil, nil

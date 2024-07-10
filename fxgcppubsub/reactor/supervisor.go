@@ -44,5 +44,7 @@ func (s *DefaultWaiterSupervisor) StopWaiter(target string, data any, err error)
 
 	if waiter, found := s.waiters[target]; found {
 		waiter.Stop(data, err)
+
+		delete(s.waiters, target)
 	}
 }
