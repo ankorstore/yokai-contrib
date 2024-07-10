@@ -65,13 +65,8 @@ func TestFxGcpPubSubModule(t *testing.T) {
 		fx.Populate(&publisher, &subscriber, &supervisor),
 	).RequireStart().RequireStop()
 
-	t.Run("raw message", func(t *testing.T) {
-		res, err := publisher.Publish(ctx, "raw-topic", []byte("test"))
-		assert.NotNil(t, res)
-		assert.NoError(t, err)
-
-		sid, err := res.Get(ctx)
-		assert.NotEmpty(t, sid)
+	t.Run("raw message ack", func(t *testing.T) {
+		_, err := publisher.Publish(ctx, "raw-topic", []byte("test"))
 		assert.NoError(t, err)
 
 		publisher.Stop()
@@ -89,17 +84,31 @@ func TestFxGcpPubSubModule(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("avro message", func(t *testing.T) {
-		res, err := publisher.Publish(ctx, "avro-topic", &avro.SimpleRecord{
+	t.Run("raw message nack", func(t *testing.T) {
+		_, err := publisher.Publish(ctx, "raw-topic", []byte("test"))
+		assert.NoError(t, err)
+
+		publisher.Stop()
+
+		waiter := supervisor.StartNackWaiter("raw-subscription")
+
+		//nolint:errcheck
+		go subscriber.Subscribe(ctx, "raw-subscription", func(ctx context.Context, m *message.Message) {
+			assert.Equal(t, []byte("test"), m.Data())
+
+			m.Nack()
+		})
+
+		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		assert.NoError(t, err)
+	})
+
+	t.Run("avro message ack", func(t *testing.T) {
+		_, err := publisher.Publish(ctx, "avro-topic", &avro.SimpleRecord{
 			StringField:  "test avro",
 			FloatField:   12.34,
 			BooleanField: true,
 		})
-		assert.NotNil(t, res)
-		assert.NoError(t, err)
-
-		sid, err := res.Get(ctx)
-		assert.NotEmpty(t, sid)
 		assert.NoError(t, err)
 
 		publisher.Stop()
@@ -124,17 +133,42 @@ func TestFxGcpPubSubModule(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("proto message", func(t *testing.T) {
-		res, err := publisher.Publish(ctx, "proto-topic", &proto.SimpleRecord{
+	t.Run("avro message nack", func(t *testing.T) {
+		_, err := publisher.Publish(ctx, "avro-topic", &avro.SimpleRecord{
+			StringField:  "test avro",
+			FloatField:   12.34,
+			BooleanField: true,
+		})
+		assert.NoError(t, err)
+
+		publisher.Stop()
+
+		waiter := supervisor.StartNackWaiter("avro-subscription")
+
+		//nolint:errcheck
+		go subscriber.Subscribe(ctx, "avro-subscription", func(ctx context.Context, m *message.Message) {
+			var out avro.SimpleRecord
+
+			err = m.Decode(&out)
+			assert.NoError(t, err)
+
+			assert.Equal(t, "test avro", out.StringField)
+			assert.Equal(t, float32(12.34), out.FloatField)
+			assert.True(t, out.BooleanField)
+
+			m.Nack()
+		})
+
+		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		assert.NoError(t, err)
+	})
+
+	t.Run("proto message ack", func(t *testing.T) {
+		_, err := publisher.Publish(ctx, "proto-topic", &proto.SimpleRecord{
 			StringField:  "test proto",
 			FloatField:   56.78,
 			BooleanField: false,
 		})
-		assert.NotNil(t, res)
-		assert.NoError(t, err)
-
-		sid, err := res.Get(ctx)
-		assert.NotEmpty(t, sid)
 		assert.NoError(t, err)
 
 		publisher.Stop()
@@ -153,6 +187,36 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			assert.False(t, out.BooleanField)
 
 			m.Ack()
+		})
+
+		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		assert.NoError(t, err)
+	})
+
+	t.Run("proto message nack", func(t *testing.T) {
+		_, err := publisher.Publish(ctx, "proto-topic", &proto.SimpleRecord{
+			StringField:  "test proto",
+			FloatField:   56.78,
+			BooleanField: false,
+		})
+		assert.NoError(t, err)
+
+		publisher.Stop()
+
+		waiter := supervisor.StartNackWaiter("proto-subscription")
+
+		//nolint:errcheck
+		go subscriber.Subscribe(ctx, "proto-subscription", func(ctx context.Context, m *message.Message) {
+			var out proto.SimpleRecord
+
+			err = m.Decode(&out)
+			assert.NoError(t, err)
+
+			assert.Equal(t, "test proto", out.StringField)
+			assert.Equal(t, float32(56.78), out.FloatField)
+			assert.False(t, out.BooleanField)
+
+			m.Nack()
 		})
 
 		_, err = waiter.WaitMaxDuration(ctx, time.Second)

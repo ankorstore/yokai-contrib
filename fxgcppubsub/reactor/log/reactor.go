@@ -1,6 +1,8 @@
 package log
 
 import (
+	"fmt"
+
 	"github.com/ankorstore/yokai/log"
 )
 
@@ -49,7 +51,7 @@ func (r *LogReactor) FuncNames() []string {
 
 // React is the reactor logic.
 func (r *LogReactor) React(req any) (bool, any, error) {
-	r.logger.Debug().Interface("req", req).Msg("log reactor")
+	r.logger.Debug().Str("type", fmt.Sprintf("%T", req)).Interface("data", req).Msg("log reactor")
 
 	return false, nil, nil
 }

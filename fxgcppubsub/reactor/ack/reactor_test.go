@@ -36,16 +36,44 @@ func TestAckReactor(t *testing.T) {
 	react := ack.NewAckReactor(sup)
 
 	t.Run("func names", func(t *testing.T) {
-		assert.Equal(t, []string{"Acknowledge"}, react.FuncNames())
+		assert.Equal(
+			t,
+			[]string{
+				"Acknowledge",
+				"ModifyAckDeadline",
+			},
+			react.FuncNames(),
+		)
 	})
 
-	t.Run("react", func(t *testing.T) {
+	t.Run("react to ack", func(t *testing.T) {
 		req := &pubsubpb.AcknowledgeRequest{
 			Subscription: subscription.NormalizeSubscriptionName("test-project", "test-subscription"),
 			AckIds:       []string{"test-id"},
 		}
 
 		waiter := sup.StartAckWaiter("test-subscription")
+
+		go func() {
+			rHandled, rRet, rErr := react.React(req)
+
+			assert.False(t, rHandled)
+			assert.Nil(t, rRet)
+			assert.NoError(t, rErr)
+		}()
+
+		data, err := waiter.WaitMaxDuration(context.Background(), 1*time.Millisecond)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"test-id"}, data)
+	})
+
+	t.Run("react to nack", func(t *testing.T) {
+		req := &pubsubpb.ModifyAckDeadlineRequest{
+			Subscription: subscription.NormalizeSubscriptionName("test-project", "test-subscription"),
+			AckIds:       []string{"test-id"},
+		}
+
+		waiter := sup.StartNackWaiter("test-subscription")
 
 		go func() {
 			rHandled, rRet, rErr := react.React(req)

@@ -3,6 +3,7 @@ package log_test
 import (
 	"testing"
 
+	"cloud.google.com/go/pubsub/apiv1/pubsubpb"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor/log"
 	yokailog "github.com/ankorstore/yokai/log"
 	"github.com/ankorstore/yokai/log/logtest"
@@ -61,7 +62,12 @@ func TestLogReactor(t *testing.T) {
 	t.Run("react", func(t *testing.T) {
 		t.Parallel()
 
-		rHandled, rRet, rErr := react.React("test")
+		req := &pubsubpb.AcknowledgeRequest{
+			Subscription: "test-subscription",
+			AckIds:       []string{"test-id"},
+		}
+
+		rHandled, rRet, rErr := react.React(req)
 
 		assert.False(t, rHandled)
 		assert.Nil(t, rRet)
@@ -69,7 +75,8 @@ func TestLogReactor(t *testing.T) {
 
 		logtest.AssertHasLogRecord(t, logBuffer, map[string]interface{}{
 			"level":   "debug",
-			"req":     "test",
+			"type":    "*pubsubpb.AcknowledgeRequest",
+			"data":    "map[ack_ids:[test-id] subscription:test-subscription]",
 			"message": "log reactor",
 		})
 	})
