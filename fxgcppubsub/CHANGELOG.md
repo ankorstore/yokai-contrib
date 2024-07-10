@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/ankorstore/yokai-contrib/compare/fxgcppubsub/v1.3.1...fxgcppubsub/v1.4.0) (2024-07-10)
+
+
+### Features
+
+* **fxgcppubsub:** Added nack reactor ([#22](https://github.com/ankorstore/yokai-contrib/issues/22)) ([3cae2a1](https://github.com/ankorstore/yokai-contrib/commit/3cae2a13ab643a90e3bb2bd323b8e6ef5ee5bac8))
+
 ## [1.3.1](https://github.com/ankorstore/yokai-contrib/compare/fxgcppubsub/v1.3.0...fxgcppubsub/v1.3.1) (2024-07-09)
 
 
