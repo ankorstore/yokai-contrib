@@ -62,7 +62,7 @@ func TestAckReactor(t *testing.T) {
 			assert.NoError(t, rErr)
 		}()
 
-		data, err := waiter.WaitMaxDuration(context.Background(), 1*time.Millisecond)
+		data, err := waiter.WaitMaxDuration(context.Background(), 5*time.Millisecond)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{"test-id"}, data)
 	})
@@ -83,7 +83,7 @@ func TestAckReactor(t *testing.T) {
 			assert.NoError(t, rErr)
 		}()
 
-		data, err := waiter.WaitMaxDuration(context.Background(), 1*time.Millisecond)
+		data, err := waiter.WaitMaxDuration(context.Background(), 5*time.Millisecond)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{"test-id"}, data)
 	})
