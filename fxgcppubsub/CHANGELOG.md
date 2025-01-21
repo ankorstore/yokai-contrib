@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/ankorstore/yokai-contrib/compare/fxgcppubsub/v1.4.1...fxgcppubsub/v1.5.0) (2025-01-21)
+
+
+### Features
+
+* **fxgcppubsub:** Added initialization logs ([#26](https://github.com/ankorstore/yokai-contrib/issues/26)) ([6a1cfa7](https://github.com/ankorstore/yokai-contrib/commit/6a1cfa734e42ed5c7ed90d4d74e7b5f7caaa6c71))
+
 ## [1.4.1](https://github.com/ankorstore/yokai-contrib/compare/fxgcppubsub/v1.4.0...fxgcppubsub/v1.4.1) (2024-07-10)
 
 
