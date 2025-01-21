@@ -73,6 +73,6 @@ func TestDefaultTopicFactory(t *testing.T) {
 		sub, err := factory.Create(ctx, "test-topic")
 		assert.Nil(t, sub)
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "cannot get topic configuration")
+		assert.Contains(t, err.Error(), "cannot get topic test-topic configuration")
 	})
 }
