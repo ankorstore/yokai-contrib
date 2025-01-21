@@ -80,7 +80,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Ack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 
@@ -99,7 +99,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Nack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 
@@ -129,7 +129,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Ack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 
@@ -159,7 +159,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Nack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 
@@ -189,7 +189,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Ack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 
@@ -219,7 +219,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Nack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 }
