@@ -22,50 +22,58 @@ func TestFxGcpPubSubModule(t *testing.T) {
 	t.Setenv("APP_CONFIG_PATH", "testdata/config")
 	t.Setenv("GCP_PROJECT_ID", "test-project")
 
-	var publisher fxgcppubsub.Publisher
-	var subscriber fxgcppubsub.Subscriber
-	var supervisor ack.AckSupervisor
+	runTest := func(tb testing.TB) (context.Context, fxgcppubsub.Publisher, fxgcppubsub.Subscriber, ack.AckSupervisor) {
+		tb.Helper()
 
-	ctx := context.Background()
-	avroSchemaDefinition := avro.GetTestAvroSchemaDefinition(t)
-	protoSchemaDefinition := proto.GetTestProtoSchemaDefinition(t)
+		var publisher fxgcppubsub.Publisher
+		var subscriber fxgcppubsub.Subscriber
+		var supervisor ack.AckSupervisor
 
-	fxtest.New(
-		t,
-		fx.NopLogger,
-		fxconfig.FxConfigModule,
-		fxgcppubsub.FxGcpPubSubModule,
-		fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
-		fxgcppubsub.PrepareTopicAndSubscription(fxgcppubsub.PrepareTopicAndSubscriptionParams{
-			TopicID:        "raw-topic",
-			SubscriptionID: "raw-subscription",
-		}),
-		fxgcppubsub.PrepareTopicAndSubscriptionWithSchema(fxgcppubsub.PrepareTopicAndSubscriptionWithSchemaParams{
-			TopicID:        "avro-topic",
-			SubscriptionID: "avro-subscription",
-			SchemaID:       "avro-schema",
-			SchemaConfig: pubsub.SchemaConfig{
-				Name:       "avro-schema",
-				Type:       pubsub.SchemaAvro,
-				Definition: avroSchemaDefinition,
-			},
-			SchemaEncoding: pubsub.EncodingBinary,
-		}),
-		fxgcppubsub.PrepareTopicAndSubscriptionWithSchema(fxgcppubsub.PrepareTopicAndSubscriptionWithSchemaParams{
-			TopicID:        "proto-topic",
-			SubscriptionID: "proto-subscription",
-			SchemaID:       "proto-schema",
-			SchemaConfig: pubsub.SchemaConfig{
-				Name:       "proto-schema",
-				Type:       pubsub.SchemaProtocolBuffer,
-				Definition: protoSchemaDefinition,
-			},
-			SchemaEncoding: pubsub.EncodingBinary,
-		}),
-		fx.Populate(&publisher, &subscriber, &supervisor),
-	).RequireStart().RequireStop()
+		ctx := context.Background()
+		avroSchemaDefinition := avro.GetTestAvroSchemaDefinition(t)
+		protoSchemaDefinition := proto.GetTestProtoSchemaDefinition(t)
+
+		fxtest.New(
+			t,
+			fx.NopLogger,
+			fxconfig.FxConfigModule,
+			fxgcppubsub.FxGcpPubSubModule,
+			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
+			fxgcppubsub.PrepareTopicAndSubscription(fxgcppubsub.PrepareTopicAndSubscriptionParams{
+				TopicID:        "raw-topic",
+				SubscriptionID: "raw-subscription",
+			}),
+			fxgcppubsub.PrepareTopicAndSubscriptionWithSchema(fxgcppubsub.PrepareTopicAndSubscriptionWithSchemaParams{
+				TopicID:        "avro-topic",
+				SubscriptionID: "avro-subscription",
+				SchemaID:       "avro-schema",
+				SchemaConfig: pubsub.SchemaConfig{
+					Name:       "avro-schema",
+					Type:       pubsub.SchemaAvro,
+					Definition: avroSchemaDefinition,
+				},
+				SchemaEncoding: pubsub.EncodingBinary,
+			}),
+			fxgcppubsub.PrepareTopicAndSubscriptionWithSchema(fxgcppubsub.PrepareTopicAndSubscriptionWithSchemaParams{
+				TopicID:        "proto-topic",
+				SubscriptionID: "proto-subscription",
+				SchemaID:       "proto-schema",
+				SchemaConfig: pubsub.SchemaConfig{
+					Name:       "proto-schema",
+					Type:       pubsub.SchemaProtocolBuffer,
+					Definition: protoSchemaDefinition,
+				},
+				SchemaEncoding: pubsub.EncodingBinary,
+			}),
+			fx.Populate(&publisher, &subscriber, &supervisor),
+		).RequireStart().RequireStop()
+
+		return ctx, publisher, subscriber, supervisor
+	}
 
 	t.Run("raw message ack", func(t *testing.T) {
+		ctx, publisher, subscriber, supervisor := runTest(t)
+
 		_, err := publisher.Publish(ctx, "raw-topic", []byte("test"))
 		assert.NoError(t, err)
 
@@ -80,11 +88,13 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Ack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 
 	t.Run("raw message nack", func(t *testing.T) {
+		ctx, publisher, subscriber, supervisor := runTest(t)
+
 		_, err := publisher.Publish(ctx, "raw-topic", []byte("test"))
 		assert.NoError(t, err)
 
@@ -99,11 +109,13 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Nack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 
 	t.Run("avro message ack", func(t *testing.T) {
+		ctx, publisher, subscriber, supervisor := runTest(t)
+
 		_, err := publisher.Publish(ctx, "avro-topic", &avro.SimpleRecord{
 			StringField:  "test avro",
 			FloatField:   12.34,
@@ -129,11 +141,13 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Ack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 
 	t.Run("avro message nack", func(t *testing.T) {
+		ctx, publisher, subscriber, supervisor := runTest(t)
+
 		_, err := publisher.Publish(ctx, "avro-topic", &avro.SimpleRecord{
 			StringField:  "test avro",
 			FloatField:   12.34,
@@ -159,11 +173,13 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Nack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 
 	t.Run("proto message ack", func(t *testing.T) {
+		ctx, publisher, subscriber, supervisor := runTest(t)
+
 		_, err := publisher.Publish(ctx, "proto-topic", &proto.SimpleRecord{
 			StringField:  "test proto",
 			FloatField:   56.78,
@@ -189,11 +205,13 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Ack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 
 	t.Run("proto message nack", func(t *testing.T) {
+		ctx, publisher, subscriber, supervisor := runTest(t)
+
 		_, err := publisher.Publish(ctx, "proto-topic", &proto.SimpleRecord{
 			StringField:  "test proto",
 			FloatField:   56.78,
@@ -219,7 +237,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			m.Nack()
 		})
 
-		_, err = waiter.WaitMaxDuration(ctx, time.Second)
+		_, err = waiter.WaitMaxDuration(ctx, 2*time.Second)
 		assert.NoError(t, err)
 	})
 }

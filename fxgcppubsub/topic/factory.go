@@ -40,7 +40,7 @@ func (f *DefaultTopicFactory) Create(ctx context.Context, topicID string) (*Topi
 	// topic config
 	topicConfig, err := topic.Config(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get topic configuration: %w", err)
+		return nil, fmt.Errorf("cannot get topic %s configuration: %w", topicID, err)
 	}
 
 	// topic schema config
@@ -51,7 +51,7 @@ func (f *DefaultTopicFactory) Create(ctx context.Context, topicID string) (*Topi
 	if topicConfig.SchemaSettings != nil {
 		topicSchemaConfig, err := f.registry.Get(ctx, topicConfig.SchemaSettings.Schema)
 		if err != nil {
-			return nil, fmt.Errorf("cannot get topic schema configuration: %w", err)
+			return nil, fmt.Errorf("cannot get topic %s schema configuration: %w", topicID, err)
 		}
 
 		topicSchemaType = topicSchemaConfig.Type
@@ -62,7 +62,7 @@ func (f *DefaultTopicFactory) Create(ctx context.Context, topicID string) (*Topi
 	// topic codec
 	topicCodec, err := f.factory.Create(topicSchemaType, topicSchemaEncoding, topicSchemaDefinition)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create topic codec: %w", err)
+		return nil, fmt.Errorf("cannot create topic %s codec: %w", topicID, err)
 	}
 
 	return NewTopic(topicCodec, topic), nil
