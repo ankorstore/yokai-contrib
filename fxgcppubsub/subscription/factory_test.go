@@ -77,6 +77,6 @@ func TestDefaultSubscriptionFactory(t *testing.T) {
 		sub, err := factory.Create(ctx, "test-subscription")
 		assert.Nil(t, sub)
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "cannot get subscription configuration")
+		assert.Contains(t, err.Error(), "cannot get subscription test-subscription configuration")
 	})
 }
