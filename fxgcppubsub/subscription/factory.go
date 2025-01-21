@@ -40,13 +40,13 @@ func (f *DefaultSubscriptionFactory) Create(ctx context.Context, subscriptionID 
 	// subscription config
 	subscriptionConfig, err := subscription.Config(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get subscription configuration: %w", err)
+		return nil, fmt.Errorf("cannot get subscription %s configuration: %w", subscriptionID, err)
 	}
 
 	// subscription topic config
 	topicConfig, err := subscriptionConfig.Topic.Config(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get subscription topic configuration: %w", err)
+		return nil, fmt.Errorf("cannot get subscription %s topic configuration: %w", subscriptionID, err)
 	}
 
 	// subscription topic schema config
@@ -57,7 +57,7 @@ func (f *DefaultSubscriptionFactory) Create(ctx context.Context, subscriptionID 
 	if topicConfig.SchemaSettings != nil {
 		topicSchemaConfig, err := f.registry.Get(ctx, topicConfig.SchemaSettings.Schema)
 		if err != nil {
-			return nil, fmt.Errorf("cannot get subscription topic schema configuration: %w", err)
+			return nil, fmt.Errorf("cannot get subscription %s topic schema configuration: %w", subscriptionID, err)
 		}
 
 		topicSchemaType = topicSchemaConfig.Type
@@ -68,7 +68,7 @@ func (f *DefaultSubscriptionFactory) Create(ctx context.Context, subscriptionID 
 	// subscription codec
 	subscriptionCodec, err := f.factory.Create(topicSchemaType, topicSchemaEncoding, topicSchemaDefinition)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create subscription codec: %w", err)
+		return nil, fmt.Errorf("cannot create subscription %s codec: %w", subscriptionID, err)
 	}
 
 	return NewSubscription(subscriptionCodec, subscription), nil
