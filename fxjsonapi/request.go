@@ -7,8 +7,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func UnmarshallRequest(c echo.Context, payload any) error {
-	err := jsonapi.UnmarshalPayload(c.Request().Body, payload)
+func UnmarshallRequest(c echo.Context, data any) error {
+	err := jsonapi.UnmarshalPayload(c.Request().Body, data)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
