@@ -11,6 +11,11 @@
       "component": "fxgomysqlserver",
       "tag-separator": "/"
     },
+    "fxjsonapi": {
+      "release-type": "go",
+      "component": "fxjsonapi",
+      "tag-separator": "/"
+    },
     "fxslack": {
       "release-type": "go",
       "component": "fxslack",
