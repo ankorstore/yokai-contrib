@@ -9,13 +9,12 @@ import (
 )
 
 type MarshallParams struct {
-	Data            any
 	Metadata        map[string]interface{}
 	WithoutIncluded bool
 }
 
-func Marshall(params MarshallParams) ([]byte, error) {
-	mp, err := jsonapi.Marshal(params.Data)
+func Marshall(data any, params MarshallParams) ([]byte, error) {
+	mp, err := jsonapi.Marshal(data)
 	if err != nil {
 		return nil, err
 	}
