@@ -14,6 +14,7 @@ import (
 
 type Processor interface {
 	ProcessRequest(c echo.Context, data any, options ...ProcessorOption) error
+	ProcessResponse(c echo.Context, code int, data any, options ...ProcessorOption) error
 }
 
 type DefaultProcessor struct {
