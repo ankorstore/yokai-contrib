@@ -11,7 +11,7 @@ const ModuleName = "jsonapi"
 var FxJSONAPIModule = fx.Module(
 	ModuleName,
 	fx.Provide(
-		ProvideProcessor,
+		fx.Annotate(ProvideProcessor, fx.As(new(Processor))),
 	),
 )
 
@@ -20,6 +20,6 @@ type ProvideProcessorParam struct {
 	Config *config.Config
 }
 
-func ProvideProcessor(p ProvideProcessorParam) Processor {
+func ProvideProcessor(p ProvideProcessorParam) *DefaultProcessor {
 	return NewDefaultProcessor(p.Config)
 }
