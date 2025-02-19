@@ -15,17 +15,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type JSONAPIErrorHandler struct {
+type ErrorHandler struct {
 	config *config.Config
 }
 
-func NewJSONAPIErrorHandler(config *config.Config) *JSONAPIErrorHandler {
-	return &JSONAPIErrorHandler{
+func NewErrorHandler(config *config.Config) *ErrorHandler {
+	return &ErrorHandler{
 		config: config,
 	}
 }
 
-func (h *JSONAPIErrorHandler) Handle() echo.HTTPErrorHandler {
+func (h *ErrorHandler) Handle() echo.HTTPErrorHandler {
 	obfuscate := !h.config.AppDebug() || h.config.GetBool("modules.http.server.errors.obfuscate")
 
 	return func(err error, c echo.Context) {
@@ -81,7 +81,7 @@ func (h *JSONAPIErrorHandler) Handle() echo.HTTPErrorHandler {
 	}
 }
 
-func (h *JSONAPIErrorHandler) handleJSONAPIError(c echo.Context, inErr *jsonapi.ErrorObject, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
+func (h *ErrorHandler) handleJSONAPIError(c echo.Context, inErr *jsonapi.ErrorObject, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
 	outErr := &jsonapi.ErrorObject{
 		ID:     httpserver.CtxRequestId(c),
 		Title:  inErr.Title,
@@ -103,7 +103,7 @@ func (h *JSONAPIErrorHandler) handleJSONAPIError(c echo.Context, inErr *jsonapi.
 	return []*jsonapi.ErrorObject{outErr}, outCode
 }
 
-func (h *JSONAPIErrorHandler) handleHTTPError(c echo.Context, inErr *echo.HTTPError, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
+func (h *ErrorHandler) handleHTTPError(c echo.Context, inErr *echo.HTTPError, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
 	outErr := &jsonapi.ErrorObject{
 		ID:     httpserver.CtxRequestId(c),
 		Title:  http.StatusText(inErr.Code),
@@ -119,7 +119,7 @@ func (h *JSONAPIErrorHandler) handleHTTPError(c echo.Context, inErr *echo.HTTPEr
 	return []*jsonapi.ErrorObject{outErr}, inErr.Code
 }
 
-func (h *JSONAPIErrorHandler) handleValidationError(c echo.Context, inErr validator.ValidationErrors, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
+func (h *ErrorHandler) handleValidationError(c echo.Context, inErr validator.ValidationErrors, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
 	var outErrs []*jsonapi.ErrorObject
 
 	for k, iErr := range inErr {
@@ -141,7 +141,7 @@ func (h *JSONAPIErrorHandler) handleValidationError(c echo.Context, inErr valida
 	return outErrs, http.StatusBadRequest
 }
 
-func (h *JSONAPIErrorHandler) handleGenericError(c echo.Context, inErr error, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
+func (h *ErrorHandler) handleGenericError(c echo.Context, inErr error, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
 	outErr := &jsonapi.ErrorObject{
 		ID:     httpserver.CtxRequestId(c),
 		Title:  http.StatusText(http.StatusInternalServerError),

@@ -2,6 +2,7 @@ package fxjsonapi
 
 import (
 	"github.com/ankorstore/yokai/config"
+	"github.com/ankorstore/yokai/fxhttpserver"
 	"go.uber.org/fx"
 )
 
@@ -10,9 +11,8 @@ const ModuleName = "jsonapi"
 
 var FxJSONAPIModule = fx.Module(
 	ModuleName,
-	fx.Provide(
-		fx.Annotate(ProvideProcessor, fx.As(new(Processor))),
-	),
+	fxhttpserver.AsErrorHandler(NewErrorHandler),
+	fx.Provide(fx.Annotate(ProvideProcessor, fx.As(new(Processor)))),
 )
 
 type ProvideProcessorParam struct {
