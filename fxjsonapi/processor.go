@@ -36,7 +36,6 @@ func (p *DefaultProcessor) ProcessRequest(c echo.Context, data any, options ...P
 	}
 
 	var span oteltrace.Span
-	defer span.End()
 
 	if processorOptions.Trace {
 		ctx, span = trace.CtxTracer(ctx).Start(ctx, "JSON API request processing")
@@ -62,6 +61,10 @@ func (p *DefaultProcessor) ProcessRequest(c echo.Context, data any, options ...P
 		log.CtxLogger(ctx).Debug().Msg("JSON API request processing success")
 	}
 
+	if processorOptions.Trace && span != nil {
+		span.End()
+	}
+
 	return nil
 }
 
@@ -74,7 +77,6 @@ func (p *DefaultProcessor) ProcessResponse(c echo.Context, code int, data any, o
 	}
 
 	var span oteltrace.Span
-	defer span.End()
 
 	if processorOptions.Trace {
 		ctx, span = trace.CtxTracer(ctx).Start(ctx, "JSON API response processing")
@@ -101,6 +103,10 @@ func (p *DefaultProcessor) ProcessResponse(c echo.Context, code int, data any, o
 
 	if processorOptions.Log {
 		log.CtxLogger(ctx).Debug().Msg("JSON API response processing success")
+	}
+
+	if processorOptions.Trace && span != nil {
+		span.End()
 	}
 
 	return c.Blob(code, jsonapi.MediaType, marshalledData)
