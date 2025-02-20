@@ -15,16 +15,21 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// ErrorHandler is an Echo error handler for JSON APIs.
 type ErrorHandler struct {
 	config *config.Config
 }
 
+// NewErrorHandler provides a new ErrorHandler instance.
 func NewErrorHandler(config *config.Config) *ErrorHandler {
 	return &ErrorHandler{
 		config: config,
 	}
 }
 
+// Handle returns the Echo compatible echo.HTTPErrorHandler.
+//
+//nolint:cyclop
 func (h *ErrorHandler) Handle() echo.HTTPErrorHandler {
 	obfuscate := !h.config.AppDebug() || h.config.GetBool("modules.http.server.errors.obfuscate")
 
@@ -64,6 +69,9 @@ func (h *ErrorHandler) Handle() echo.HTTPErrorHandler {
 
 		if c.Request().Method == http.MethodHead {
 			err = c.NoContent(outCode)
+			if err != nil {
+				logger.Error().Err(err).Msg("json api error handler no content failure")
+			}
 
 			return
 		}
@@ -120,7 +128,7 @@ func (h *ErrorHandler) handleHTTPError(c echo.Context, inErr *echo.HTTPError, ob
 }
 
 func (h *ErrorHandler) handleValidationError(c echo.Context, inErr validator.ValidationErrors, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
-	var outErrs []*jsonapi.ErrorObject
+	outErrs := []*jsonapi.ErrorObject{}
 
 	for k, iErr := range inErr {
 		outErr := &jsonapi.ErrorObject{

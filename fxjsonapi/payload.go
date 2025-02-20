@@ -13,6 +13,7 @@ type MarshallParams struct {
 	WithoutIncluded bool
 }
 
+//nolint:cyclop
 func Marshall(data any, params MarshallParams) ([]byte, error) {
 	mp, err := jsonapi.Marshal(data)
 	if err != nil {

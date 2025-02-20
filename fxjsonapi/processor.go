@@ -12,6 +12,8 @@ import (
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
+var _ Processor = (*DefaultProcessor)(nil)
+
 type Processor interface {
 	ProcessRequest(c echo.Context, data any, options ...ProcessorOption) error
 	ProcessResponse(c echo.Context, code int, data any, options ...ProcessorOption) error
