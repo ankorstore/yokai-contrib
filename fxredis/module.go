@@ -16,6 +16,7 @@ const ModuleName = "redis"
 var FxRedisModule = fx.Module(
 	ModuleName,
 	fx.Provide(
+		fx.Annotate(NewDefaultRedisClientFactory, fx.As(new(RedisClientFactory))),
 		NewFxRedisClient,
 	),
 )
@@ -25,30 +26,18 @@ type FxRedisClientParam struct {
 	fx.In
 	LifeCycle fx.Lifecycle
 	Config    *config.Config
+	Factory   RedisClientFactory
 }
 
-// NewFxRedisClient returns a [redis.Client].
+// NewFxRedisClient returns a [redis.Client] and a [redismock.ClientMock] in test mode.
 func NewFxRedisClient(p FxRedisClientParam) (*redis.Client, redismock.ClientMock, error) {
 	if p.Config.IsTestEnv() {
-		return createMockClient()
+		client, clientMock := redismock.NewClientMock()
+
+		return client, clientMock, nil
 	} else {
-		client, err := createClient(p)
+		client, err := p.Factory.Create()
 
 		return client, nil, err
 	}
-}
-
-func createClient(p FxRedisClientParam) (*redis.Client, error) {
-	opt, err := redis.ParseURL(p.Config.GetString("modules.redis.dsn"))
-	if err != nil {
-		return nil, err
-	}
-
-	return redis.NewClient(opt), nil
-}
-
-func createMockClient() (*redis.Client, redismock.ClientMock, error) {
-	client, clientMock := redismock.NewClientMock()
-
-	return client, clientMock, nil
 }
