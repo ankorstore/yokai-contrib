@@ -2,6 +2,7 @@ package fxjsonapi
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/ankorstore/yokai/config"
 	"github.com/ankorstore/yokai/log"
@@ -30,12 +31,13 @@ func NewDefaultProcessor(config *config.Config) *DefaultProcessor {
 }
 
 func (p *DefaultProcessor) ProcessRequest(c echo.Context, data any, options ...ProcessorOption) error {
-	ctx := c.Request().Context()
-
 	processorOptions := DefaultProcessorOptions(p.config)
 	for _, processorOption := range options {
 		processorOption(&processorOptions)
 	}
+
+	req := c.Request()
+	ctx := req.Context()
 
 	var span oteltrace.Span
 
@@ -43,12 +45,37 @@ func (p *DefaultProcessor) ProcessRequest(c echo.Context, data any, options ...P
 		ctx, span = trace.CtxTracer(ctx).Start(ctx, "JSON API request processing")
 	}
 
+	defer func() {
+		if processorOptions.Trace && span != nil {
+			span.End()
+		}
+	}()
+
+	logger := log.CtxLogger(ctx)
+
+	contentTypeHeader, _, _ := strings.Cut(req.Header.Get(echo.HeaderContentType), ";")
+	contentType := strings.ToLower(strings.TrimSpace(contentTypeHeader))
+
+	if contentType != jsonapi.MediaType {
+		errMsg := "JSON API request invalid content type"
+
+		if processorOptions.Log {
+			logger.Error().Msg(errMsg)
+		}
+
+		if processorOptions.Trace && span != nil {
+			span.SetStatus(codes.Error, errMsg)
+		}
+
+		return echo.NewHTTPError(http.StatusUnsupportedMediaType, errMsg)
+	}
+
 	err := jsonapi.UnmarshalPayload(c.Request().Body, data)
 	if err != nil {
 		errMsg := "JSON API request processing error"
 
 		if processorOptions.Log {
-			log.CtxLogger(ctx).Error().Err(err).Msg(errMsg)
+			logger.Error().Err(err).Msg(errMsg)
 		}
 
 		if processorOptions.Trace && span != nil {
@@ -59,30 +86,40 @@ func (p *DefaultProcessor) ProcessRequest(c echo.Context, data any, options ...P
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
+	okMsg := "JSON API request processing success"
+
 	if processorOptions.Log {
-		log.CtxLogger(ctx).Debug().Msg("JSON API request processing success")
+		logger.Debug().Msg(okMsg)
 	}
 
 	if processorOptions.Trace && span != nil {
-		span.End()
+		span.SetStatus(codes.Ok, okMsg)
 	}
 
 	return nil
 }
 
 func (p *DefaultProcessor) ProcessResponse(c echo.Context, code int, data any, options ...ProcessorOption) error {
-	ctx := c.Request().Context()
-
 	processorOptions := DefaultProcessorOptions(p.config)
 	for _, processorOption := range options {
 		processorOption(&processorOptions)
 	}
+
+	ctx := c.Request().Context()
 
 	var span oteltrace.Span
 
 	if processorOptions.Trace {
 		ctx, span = trace.CtxTracer(ctx).Start(ctx, "JSON API response processing")
 	}
+
+	defer func() {
+		if processorOptions.Trace && span != nil {
+			span.End()
+		}
+	}()
+
+	logger := log.CtxLogger(ctx)
 
 	marshalledData, err := Marshall(data, MarshallParams{
 		WithoutIncluded: !processorOptions.Included,
@@ -92,7 +129,7 @@ func (p *DefaultProcessor) ProcessResponse(c echo.Context, code int, data any, o
 		errMsg := "JSON API response processing error"
 
 		if processorOptions.Log {
-			log.CtxLogger(ctx).Error().Err(err).Msg(errMsg)
+			logger.Error().Err(err).Msg(errMsg)
 		}
 
 		if processorOptions.Trace && span != nil {
@@ -103,12 +140,14 @@ func (p *DefaultProcessor) ProcessResponse(c echo.Context, code int, data any, o
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	okMsg := "JSON API response processing success"
+
 	if processorOptions.Log {
-		log.CtxLogger(ctx).Debug().Msg("JSON API response processing success")
+		logger.Debug().Msg("JSON API response processing success")
 	}
 
 	if processorOptions.Trace && span != nil {
-		span.End()
+		span.SetStatus(codes.Ok, okMsg)
 	}
 
 	return c.Blob(code, jsonapi.MediaType, marshalledData)

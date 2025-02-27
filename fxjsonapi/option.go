@@ -26,20 +26,20 @@ func WithMetadata(m map[string]any) ProcessorOption {
 	}
 }
 
-func WithoutIncluded() ProcessorOption {
+func WithIncluded(i bool) ProcessorOption {
 	return func(o *Options) {
-		o.Included = false
+		o.Included = i
 	}
 }
 
-func WithLog() ProcessorOption {
+func WithLog(l bool) ProcessorOption {
 	return func(o *Options) {
-		o.Log = true
+		o.Log = l
 	}
 }
 
-func WithTrace() ProcessorOption {
+func WithTrace(t bool) ProcessorOption {
 	return func(o *Options) {
-		o.Trace = true
+		o.Trace = t
 	}
 }

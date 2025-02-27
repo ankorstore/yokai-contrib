@@ -7,3 +7,8 @@ modules:
   trace:
     processor:
       type: test
+  jsonapi:
+    log:
+      enabled: true
+    trace:
+      enabled: true
