@@ -90,7 +90,7 @@ type Foo struct {
 
 func (f Foo) JSONAPIMeta() *jsonapi.Meta {
 	return &jsonapi.Meta{
-		"meta": "foo",
+		"some": "foo meta",
 	}
 }
 
@@ -101,7 +101,7 @@ type Bar struct {
 
 func (b Bar) JSONAPIMeta() *jsonapi.Meta {
 	return &jsonapi.Meta{
-		"meta": "bar",
+		"some": "bar meta",
 	}
 }
 
@@ -125,9 +125,9 @@ func (h *JSONAPIHandler) Handle() echo.HandlerFunc {
 			c,
 			// pointer to the struct to unmarshall
 			&foo,
-			// override module config for logging
+			// optionally override module config for logging
 			fxjsonapi.WithLog(true),
-			// override module config for tracing
+			// optionally override module config for tracing
 			fxjsonapi.WithTrace(true),
 			)
 		if err != nil {
@@ -207,13 +207,13 @@ func (h *JSONAPIHandler) Handle() echo.HandlerFunc {
 			&foo,
 			// optionally pass metadata to the JSON API response
 			fxjsonapi.WithMetadata(map[string]interface{}{
-				"some": "meta",
+				"some": "response meta",
 			}),
 			// optionally remove the included from the JSON API response (enabled by default)
 			fxjsonapi.WithIncluded(false),
-			// override module config for logging
+			// optionally override module config for logging
 			fxjsonapi.WithLog(true),
-			// override module config for tracing
+			// optionally override module config for tracing
 			fxjsonapi.WithTrace(true),
 		)
 	}
