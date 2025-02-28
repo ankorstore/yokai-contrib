@@ -162,7 +162,7 @@ type Foo struct {
 
 func (f Foo) JSONAPIMeta() *jsonapi.Meta {
 	return &jsonapi.Meta{
-		"meta": "foo",
+		"some": "foo meta",
 	}
 }
 
@@ -173,7 +173,7 @@ type Bar struct {
 
 func (b Bar) JSONAPIMeta() *jsonapi.Meta {
 	return &jsonapi.Meta{
-		"meta": "bar",
+		"some": "bar meta",
 	}
 }
 
