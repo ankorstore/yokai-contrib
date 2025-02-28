@@ -15,21 +15,26 @@ import (
 
 var _ Processor = (*DefaultProcessor)(nil)
 
+// Processor is the interface for json api processors implementations.
 type Processor interface {
 	ProcessRequest(c echo.Context, data any, options ...ProcessorOption) error
 	ProcessResponse(c echo.Context, code int, data any, options ...ProcessorOption) error
 }
 
+// DefaultProcessor is the default [Processor] implementation.
 type DefaultProcessor struct {
 	config *config.Config
 }
 
+// NewDefaultProcessor returns a new [DefaultProcessor] instance.
 func NewDefaultProcessor(config *config.Config) *DefaultProcessor {
 	return &DefaultProcessor{
 		config: config,
 	}
 }
 
+// ProcessRequest processes a json api request.
+//
 //nolint:cyclop
 func (p *DefaultProcessor) ProcessRequest(c echo.Context, data any, options ...ProcessorOption) error {
 	processorOptions := DefaultProcessorOptions(p.config)
@@ -100,6 +105,8 @@ func (p *DefaultProcessor) ProcessRequest(c echo.Context, data any, options ...P
 	return nil
 }
 
+// ProcessResponse processes a json api response.
+//
 //nolint:cyclop
 func (p *DefaultProcessor) ProcessResponse(c echo.Context, code int, data any, options ...ProcessorOption) error {
 	processorOptions := DefaultProcessorOptions(p.config)

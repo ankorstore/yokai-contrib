@@ -13,6 +13,8 @@ type MarshallParams struct {
 	WithoutIncluded bool
 }
 
+// Marshall is used to marshall in json api format a given input with [MarshallParams].
+//
 //nolint:cyclop
 func Marshall(data any, params MarshallParams) ([]byte, error) {
 	mp, err := jsonapi.Marshal(data)

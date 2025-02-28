@@ -1,5 +1,6 @@
 app:
   name: test-app
+  debug: false
 modules:
   log:
     level: debug
