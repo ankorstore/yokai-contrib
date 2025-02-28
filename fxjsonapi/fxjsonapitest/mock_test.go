@@ -30,7 +30,7 @@ func TestProcessorMock(t *testing.T) {
 	t.Run("request processing", func(t *testing.T) {
 		t.Parallel()
 
-		c := echo.New().NewContext(httptest.NewRequest("GET", "/test", nil), nil)
+		c := echo.New().NewContext(httptest.NewRequest(http.MethodGet, "/test", nil), nil)
 
 		s := struct{}{}
 
@@ -52,7 +52,7 @@ func TestProcessorMock(t *testing.T) {
 	t.Run("response processing", func(t *testing.T) {
 		t.Parallel()
 
-		c := echo.New().NewContext(httptest.NewRequest("GET", "/test", nil), nil)
+		c := echo.New().NewContext(httptest.NewRequest(http.MethodGet, "/test", nil), nil)
 
 		s := struct{}{}
 
