@@ -142,7 +142,7 @@ func (h *JSONAPIHandler) Handle() echo.HandlerFunc {
 Notes about `ProcessRequest()`:
 
 - if the request payload does not respect the [JSON API specifications](https://jsonapi.org/), a `400` error will be automatically returned
-- if the request `Content-Type` headers is not `application/vnd.api+json`, a `415` error will be automatically returned
+- if the request `Content-Type` header is not `application/vnd.api+json`, a `415` error will be automatically returned
 
 ### Response processing
 
