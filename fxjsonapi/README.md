@@ -248,7 +248,7 @@ You can optionally `obfuscate` the errors details (ex: for production) in the [H
 modules:
   http:
     server:
-	  errors:
+      errors:
         obfuscate: true # disabled by default
 ```
 
