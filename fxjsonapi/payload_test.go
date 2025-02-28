@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//nolint:goconst
 func TestMarshall(t *testing.T) {
 	t.Parallel()
 

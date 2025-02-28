@@ -30,6 +30,7 @@ func NewDefaultProcessor(config *config.Config) *DefaultProcessor {
 	}
 }
 
+//nolint:cyclop
 func (p *DefaultProcessor) ProcessRequest(c echo.Context, data any, options ...ProcessorOption) error {
 	processorOptions := DefaultProcessorOptions(p.config)
 	for _, processorOption := range options {
@@ -99,6 +100,7 @@ func (p *DefaultProcessor) ProcessRequest(c echo.Context, data any, options ...P
 	return nil
 }
 
+//nolint:cyclop
 func (p *DefaultProcessor) ProcessResponse(c echo.Context, code int, data any, options ...ProcessorOption) error {
 	processorOptions := DefaultProcessorOptions(p.config)
 	for _, processorOption := range options {

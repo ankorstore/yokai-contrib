@@ -26,6 +26,7 @@ import (
 	"go.uber.org/fx/fxtest"
 )
 
+//nolint:maintidx
 func TestProcessor(t *testing.T) {
 	t.Setenv("APP_CONFIG_PATH", "testdata/config")
 

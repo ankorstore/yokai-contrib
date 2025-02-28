@@ -14,10 +14,10 @@ func TestProcessorOptions(t *testing.T) {
 	cfg, err := config.NewDefaultConfigFactory().Create(config.WithFilePaths("./testdata/config"))
 	assert.NoError(t, err)
 
-	options := fxjsonapi.DefaultProcessorOptions(cfg)
-
 	t.Run("test defaults", func(t *testing.T) {
 		t.Parallel()
+
+		options := fxjsonapi.DefaultProcessorOptions(cfg)
 
 		assert.Len(t, options.Metadata, 0)
 		assert.True(t, options.Included)
@@ -28,6 +28,8 @@ func TestProcessorOptions(t *testing.T) {
 	t.Run("test with metadata", func(t *testing.T) {
 		t.Parallel()
 
+		options := fxjsonapi.DefaultProcessorOptions(cfg)
+
 		opt := fxjsonapi.WithMetadata(map[string]any{"foo": "bar"})
 		opt(&options)
 
@@ -36,6 +38,8 @@ func TestProcessorOptions(t *testing.T) {
 
 	t.Run("test with included", func(t *testing.T) {
 		t.Parallel()
+
+		options := fxjsonapi.DefaultProcessorOptions(cfg)
 
 		opt := fxjsonapi.WithIncluded(false)
 		opt(&options)
@@ -46,6 +50,8 @@ func TestProcessorOptions(t *testing.T) {
 	t.Run("test with log", func(t *testing.T) {
 		t.Parallel()
 
+		options := fxjsonapi.DefaultProcessorOptions(cfg)
+
 		opt := fxjsonapi.WithLog(true)
 		opt(&options)
 
@@ -54,6 +60,8 @@ func TestProcessorOptions(t *testing.T) {
 
 	t.Run("test with trace", func(t *testing.T) {
 		t.Parallel()
+
+		options := fxjsonapi.DefaultProcessorOptions(cfg)
 
 		opt := fxjsonapi.WithTrace(true)
 		opt(&options)
