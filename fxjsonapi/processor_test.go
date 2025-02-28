@@ -308,7 +308,7 @@ func TestProcessor(t *testing.T) {
 				http.StatusOK,
 				&foo,
 				fxjsonapi.WithMetadata(map[string]interface{}{
-					"baz": "buz",
+					"meta": "baz",
 				}),
 			)
 		}
@@ -323,7 +323,7 @@ func TestProcessor(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rec.Code, rec.Body.String())
 
-		expected := `{"data":{"type":"foo","id":"123","attributes":{"name":"foo"},"relationships":{"bar":{"data":{"type":"bar","id":"456"}}},"meta":{"meta":"foo"}},"included":[{"type":"bar","id":"456","attributes":{"name":"bar"},"meta":{"meta":"bar"}}],"meta":{"baz":"buz"}}`
+		expected := `{"data":{"type":"foo","id":"123","attributes":{"name":"foo"},"relationships":{"bar":{"data":{"type":"bar","id":"456"}}},"meta":{"meta":"foo"}},"included":[{"type":"bar","id":"456","attributes":{"name":"bar"},"meta":{"meta":"bar"}}],"meta":{"meta":"baz"}}`
 
 		assert.Equal(t, fmt.Sprintf("%s\n", expected), rec.Body.String())
 
