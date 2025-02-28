@@ -1,4 +1,4 @@
-# Fx JSON API Module
+# Yokai JSON API Module
 
 [![ci](https://github.com/ankorstore/yokai-contrib/actions/workflows/fxjsonapi-ci.yml/badge.svg)](https://github.com/ankorstore/yokai-contrib/actions/workflows/fxjsonapi-ci.yml)
 [![go report](https://goreportcard.com/badge/github.com/ankorstore/yokai-contrib/fxjsonapi)](https://goreportcard.com/report/github.com/ankorstore/yokai-contrib/fxjsonapi)
@@ -6,7 +6,7 @@
 [![Deps](https://img.shields.io/badge/osi-deps-blue)](https://deps.dev/go/github.com%2Fankorstore%2Fyokai-contrib%2Ffxjsonapi)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/ankorstore/yokai-contrib/fxjsonapi)](https://pkg.go.dev/github.com/ankorstore/yokai-contrib/fxjsonapi)
 
-> [Fx](https://uber-go.github.io/fx/) module for [JSON API](https://jsonapi.org/), based on [google/jsonapi](https://github.com/google/jsonapi).
+> [Yokai](https://github.com/ankorstore/yokai) module for [JSON API](https://jsonapi.org/), based on [google/jsonapi](https://github.com/google/jsonapi).
 
 <!-- TOC -->
 * [Overview](#overview)
