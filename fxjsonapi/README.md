@@ -227,7 +227,7 @@ func (h *JSONAPIHandler) Handle() echo.HandlerFunc {
 
 Notes about `ProcessResponse()`:
 
-- you can pass a pointer or a slice of pointers to marshall as JSON API
+- you can pass a `pointer` or a `slice of pointers` to marshall as JSON API
 - `application/vnd.api+json` will be automatically added to the response `Content-Type` header
 
 ## Error handling
