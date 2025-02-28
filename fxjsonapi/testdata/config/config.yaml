@@ -1,0 +1,15 @@
+app:
+  name: test-app
+  debug: false
+modules:
+  log:
+    level: debug
+    output: test
+  trace:
+    processor:
+      type: test
+  jsonapi:
+    log:
+      enabled: true
+    trace:
+      enabled: true
