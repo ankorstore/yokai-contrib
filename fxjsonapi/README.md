@@ -21,9 +21,9 @@
 
 ## Overview
 
-This module provides to your Fx application a [Processor](processor.go), that you can `inject` in your HTTP handlers to process [JSON API](https://jsonapi.org/) requests and responses.
+This module provides to your [Yokai](https://github.com/ankorstore/yokai) application a [Processor](processor.go), that you can `inject` in your HTTP handlers to process JSON API requests and responses.
 
-It also provides automatic [error handling](error.go), compliant with the JSON API specifications.
+It also provides automatic [error handling](error.go), compliant with the [JSON API specifications](https://jsonapi.org/).
 
 ## Installation
 
