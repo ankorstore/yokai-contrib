@@ -139,6 +139,11 @@ func (h *JSONAPIHandler) Handle() echo.HandlerFunc {
 }
 ```
 
+Notes about `ProcessRequest()`:
+
+- if the request payload does not respect the [JSON API specifications](https://jsonapi.org/), a `400` error will be automatically returned
+- if the request `Content-Type` headers is not `application/vnd.api+json`, a `415` error will be automatically returned
+
 ### Response processing
 
 You can use the provided [Processor](processor.go) to automatically process a JSON API response:
@@ -219,6 +224,11 @@ func (h *JSONAPIHandler) Handle() echo.HandlerFunc {
 	}
 }
 ```
+
+Notes about `ProcessResponse()`:
+
+- you can pass a pointer or a slice of pointers to marshall as JSON API
+- `application/vnd.api+json` will be automatically added to the response `Content-Type` header
 
 ## Error handling
 
