@@ -16,6 +16,7 @@
   * [Request processing](#request-processing)
   * [Response processing](#response-processing)
 * [Error handling](#error-handling)
+* [Testing](#testing)
 <!-- TOC -->
 
 ## Overview
@@ -229,3 +230,7 @@ It handles:
 - [validation](https://ankorstore.github.io/yokai/modules/fxvalidator/) errors (automatically sets a 400 status code)
 - [HTTP](https://echo.labstack.com/docs/error-handling) errors (automatically sets the status code of the error)
 - or any generic error (automatically sets a 500 status code)
+
+## Testing
+
+This module provides a [Processor mock](fxjsonapitest/mock.go), see [example usage](fxjsonapitest/mock_test.go).
