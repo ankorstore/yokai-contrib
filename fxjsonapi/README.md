@@ -236,10 +236,10 @@ This module automatically enables the [ErrorHandler](error.go), to convert error
 
 It handles:
 
-- [JSON API errors](https://github.com/google/jsonapi/blob/master/errors.go) errors (automatically sets a 500 status code)
-- [validation](https://ankorstore.github.io/yokai/modules/fxvalidator/) errors (automatically sets a 400 status code)
-- [HTTP](https://echo.labstack.com/docs/error-handling) errors (automatically sets the status code of the error)
-- or any generic error (automatically sets a 500 status code)
+- [JSON API errors](https://github.com/google/jsonapi/blob/master/errors.go) errors: automatically sets a `500` status code
+- [validation](https://ankorstore.github.io/yokai/modules/fxvalidator/) errors: automatically sets a `400` status code
+- [HTTP](https://echo.labstack.com/docs/error-handling) errors: automatically sets the `status code of the error`
+- or any generic error: automatically sets a `500` status code
 
 ## Testing
 
