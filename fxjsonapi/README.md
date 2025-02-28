@@ -67,6 +67,10 @@ modules:
 
 ## Processing
 
+JSON API request & response processing are driven by the `jsonapi` tag that you can set on your structs for un/marshalling operations.
+
+You can find more information about this in the underlying [google/jsonapi](https://github.com/google/jsonapi) library documentation.
+
 ### Request processing
 
 You can use the provided [Processor](processor.go) to automatically process a JSON API request:
