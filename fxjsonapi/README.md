@@ -241,6 +241,17 @@ It handles:
 - [HTTP](https://echo.labstack.com/docs/error-handling) errors: automatically sets the `status code of the error`
 - or any generic error: automatically sets a `500` status code
 
+You can optionally `obfuscate` the errors details (ex: for production) in the [HTTP server configuration](https://ankorstore.github.io/yokai/modules/fxhttpserver/#configuration):
+
+```yaml
+# ./configs/config.yaml
+modules:
+  http:
+    server:
+	  errors:
+        obfuscate: true # disabled by default
+```
+
 ## Testing
 
 This module provides a [ProcessorMock](fxjsonapitest/mock.go) for mocking [Processor](processor.go), see [usage example](fxjsonapitest/mock_test.go).
