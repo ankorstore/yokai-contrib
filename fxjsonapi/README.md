@@ -233,4 +233,4 @@ It handles:
 
 ## Testing
 
-This module provides a [Processor mock](fxjsonapitest/mock.go), see [example usage](fxjsonapitest/mock_test.go).
+This module provides a [ProcessorMock](fxjsonapitest/mock.go) for mocking [Processor](processor.go), see [usage example](fxjsonapitest/mock_test.go).
