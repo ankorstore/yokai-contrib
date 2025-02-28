@@ -28,6 +28,17 @@ import (
 func TestFxJSONAPIModule(t *testing.T) {
 	t.Setenv("APP_CONFIG_PATH", "testdata/config")
 
+	var fn handler.DynamicHandlerFunc = func(p fxjsonapi.Processor, c echo.Context) error {
+		foo := model.Foo{}
+
+		err := p.ProcessRequest(c, &foo)
+		if err != nil {
+			return err
+		}
+
+		return p.ProcessResponse(c, http.StatusOK, &foo)
+	}
+
 	runTest := func(tb testing.TB) (*echo.Echo, logtest.TestLogBuffer, tracetest.TestTraceExporter) {
 		tb.Helper()
 
@@ -45,7 +56,8 @@ func TestFxJSONAPIModule(t *testing.T) {
 			fxgenerate.FxGenerateModule,
 			fxhttpserver.FxHttpServerModule,
 			fxjsonapi.FxJSONAPIModule,
-			fxhttpserver.AsHandler("POST", "/foobar", handler.NewFooBarHandler),
+			fx.Supply(fn),
+			fxhttpserver.AsHandler("POST", "/test", handler.NewDynamicHandler),
 			fx.Populate(&httpServer, &logBuffer, &traceExporter),
 		).RequireStart().RequireStop()
 
@@ -56,7 +68,7 @@ func TestFxJSONAPIModule(t *testing.T) {
 		httpServer, logBuffer, traceExporter := runTest(t)
 
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/foobar", nil)
+		req := httptest.NewRequest(http.MethodPost, "/test", nil)
 
 		httpServer.ServeHTTP(rec, req)
 
@@ -84,7 +96,7 @@ func TestFxJSONAPIModule(t *testing.T) {
 		httpServer, logBuffer, traceExporter := runTest(t)
 
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/foobar", bytes.NewBuffer([]byte("invalid")))
+		req := httptest.NewRequest(http.MethodPost, "/test", bytes.NewBuffer([]byte("invalid")))
 		req.Header.Set(echo.HeaderContentType, jsonapi.MediaType)
 
 		httpServer.ServeHTTP(rec, req)
@@ -118,7 +130,7 @@ func TestFxJSONAPIModule(t *testing.T) {
 		assert.NoError(t, err)
 
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/foobar", bytes.NewBuffer(mFoo))
+		req := httptest.NewRequest(http.MethodPost, "/test", bytes.NewBuffer(mFoo))
 		req.Header.Set(echo.HeaderContentType, jsonapi.MediaType)
 
 		httpServer.ServeHTTP(rec, req)
@@ -157,7 +169,7 @@ func TestFxJSONAPIModule(t *testing.T) {
 		assert.NoError(t, err)
 
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/foobar", bytes.NewBuffer(mFoo))
+		req := httptest.NewRequest(http.MethodPost, "/test", bytes.NewBuffer(mFoo))
 		req.Header.Set(echo.HeaderContentType, jsonapi.MediaType)
 
 		httpServer.ServeHTTP(rec, req)
