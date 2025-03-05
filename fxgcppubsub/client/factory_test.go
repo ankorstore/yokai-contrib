@@ -73,7 +73,7 @@ func TestDefaultClientFactory(t *testing.T) {
 			context.Background(),
 			"test-project",
 			option.WithEndpoint(server.Addr),
-			//option.WithoutAuthentication(), <- removed to make the client fail
+			// option.WithoutAuthentication(), <- removed to make the client fail
 			option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())),
 		)
 
