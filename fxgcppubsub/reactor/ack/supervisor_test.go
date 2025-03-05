@@ -9,6 +9,7 @@ import (
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor/ack"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/subscription"
 	"github.com/ankorstore/yokai/fxconfig"
+	"github.com/ankorstore/yokai/fxlog"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
@@ -27,6 +28,7 @@ func TestAckSupervisor(t *testing.T) {
 		t,
 		fx.NopLogger,
 		fxconfig.FxConfigModule,
+		fxlog.FxLogModule,
 		fxgcppubsub.FxGcpPubSubModule,
 		fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
 		fx.Populate(&supervisor),

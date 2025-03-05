@@ -12,6 +12,7 @@ import (
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/testdata/avro"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/testdata/proto"
 	"github.com/ankorstore/yokai/fxconfig"
+	"github.com/ankorstore/yokai/fxlog"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
@@ -37,6 +38,7 @@ func TestFxGcpPubSubModule(t *testing.T) {
 			t,
 			fx.NopLogger,
 			fxconfig.FxConfigModule,
+			fxlog.FxLogModule,
 			fxgcppubsub.FxGcpPubSubModule,
 			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
 			fxgcppubsub.PrepareTopicAndSubscription(fxgcppubsub.PrepareTopicAndSubscriptionParams{

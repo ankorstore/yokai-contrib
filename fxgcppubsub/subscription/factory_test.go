@@ -7,6 +7,7 @@ import (
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/subscription"
 	"github.com/ankorstore/yokai/fxconfig"
+	"github.com/ankorstore/yokai/fxlog"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
@@ -26,6 +27,7 @@ func TestDefaultSubscriptionFactory(t *testing.T) {
 			t,
 			fx.NopLogger,
 			fxconfig.FxConfigModule,
+			fxlog.FxLogModule,
 			fxgcppubsub.FxGcpPubSubModule,
 			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
 			fxgcppubsub.PrepareTopicAndSubscription(fxgcppubsub.PrepareTopicAndSubscriptionParams{
@@ -47,6 +49,7 @@ func TestDefaultSubscriptionFactory(t *testing.T) {
 			t,
 			fx.NopLogger,
 			fxconfig.FxConfigModule,
+			fxlog.FxLogModule,
 			fxgcppubsub.FxGcpPubSubModule,
 			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
 			fxgcppubsub.PrepareTopicAndSubscriptionWithSchema(fxgcppubsub.PrepareTopicAndSubscriptionWithSchemaParams{
@@ -69,6 +72,7 @@ func TestDefaultSubscriptionFactory(t *testing.T) {
 			t,
 			fx.NopLogger,
 			fxconfig.FxConfigModule,
+			fxlog.FxLogModule,
 			fxgcppubsub.FxGcpPubSubModule,
 			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
 			fx.Populate(&factory),

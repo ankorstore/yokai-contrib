@@ -66,6 +66,9 @@ modules:
   gcppubsub:
     project:
       id: ${GCP_PROJECT_ID}  # GCP project id
+    factory:
+      attempts: 3            # number of attempts to perform to create the pubsub client, disabled by default
+      interval: 1            # duration in seconds to wait between each pubsub client creation attempt
     healthcheck:
       topics:                # list of topics to check for the topics probe
         - some-topic         # refers to projects/${GCP_PROJECT_ID}/topics/some-topic

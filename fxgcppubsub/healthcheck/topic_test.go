@@ -9,6 +9,7 @@ import (
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/healthcheck"
 	"github.com/ankorstore/yokai/config"
 	"github.com/ankorstore/yokai/fxconfig"
+	"github.com/ankorstore/yokai/fxlog"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
@@ -35,6 +36,7 @@ func TestGcpPubSubTopicsProbe(t *testing.T) {
 			t,
 			fx.NopLogger,
 			fxconfig.FxConfigModule,
+			fxlog.FxLogModule,
 			fxgcppubsub.FxGcpPubSubModule,
 			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
 			fxgcppubsub.PrepareTopic(fxgcppubsub.PrepareTopicParams{
@@ -55,6 +57,7 @@ func TestGcpPubSubTopicsProbe(t *testing.T) {
 			t,
 			fx.NopLogger,
 			fxconfig.FxConfigModule,
+			fxlog.FxLogModule,
 			fxgcppubsub.FxGcpPubSubModule,
 			fx.Supply(fx.Annotate(ctx, fx.As(new(context.Context)))),
 			fx.Populate(&config, &client),

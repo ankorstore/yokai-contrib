@@ -6,6 +6,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/pubsub/pstest"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/client"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/codec"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/reactor/ack"
@@ -13,6 +14,7 @@ import (
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/subscription"
 	"github.com/ankorstore/yokai-contrib/fxgcppubsub/topic"
 	"github.com/ankorstore/yokai/config"
+	"github.com/ankorstore/yokai/log"
 	"go.uber.org/fx"
 	"google.golang.org/api/option"
 	"google.golang.org/api/option/internaloption"
@@ -23,7 +25,7 @@ import (
 // ModuleName is the module name.
 const ModuleName = "gcppubsub"
 
-// FxGcpPubSubModule is the [Fx] GCP pub/sub module.
+// FxGcpPubSubModule is the [Fx] GCP pubsub module.
 //
 // [Fx]: https://github.com/uber-go/fx
 var FxGcpPubSubModule = fx.Module(
@@ -32,6 +34,10 @@ var FxGcpPubSubModule = fx.Module(
 		NewFxGcpPubSubTestServer,
 		NewFxGcpPubSubClient,
 		NewFxGcpPubSubSchemaClient,
+		fx.Annotate(
+			NewFxGcpPubSubDefaultClientFactory,
+			fx.As(new(client.ClientFactory)),
+		),
 		fx.Annotate(
 			ack.NewDefaultAckSupervisor,
 			fx.As(new(ack.AckSupervisor)),
@@ -76,6 +82,7 @@ var FxGcpPubSubModule = fx.Module(
 	AsPubSubTestServerReactor(ack.NewAckReactor),
 )
 
+// FxGcpPubSubTestServerParam allows injection of the required dependencies in [NewFxGcpPubSubTestServer].
 type FxGcpPubSubTestServerParam struct {
 	fx.In
 	Reactors []Reactor `group:"gcppubsub-reactors"`
@@ -97,6 +104,18 @@ func NewFxGcpPubSubTestServer(p FxGcpPubSubTestServerParam) *pstest.Server {
 	return pstest.NewServer(options...)
 }
 
+// FxGcpPubSubDefaultClientFactoryParam allows injection of the required dependencies in [NewFxGcpPubSubDefaultClientFactory].
+type FxGcpPubSubDefaultClientFactoryParam struct {
+	fx.In
+	Config *config.Config
+	Logger *log.Logger
+}
+
+// NewFxGcpPubSubDefaultClientFactory returns a new client default factory instance.
+func NewFxGcpPubSubDefaultClientFactory(p FxGcpPubSubDefaultClientFactoryParam) *client.DefaultClientFactory {
+	return client.NewDefaultClientFactory(p.Config, p.Logger)
+}
+
 // FxGcpPubSubClientParam allows injection of the required dependencies in [NewFxGcpPubSubClient].
 //
 //nolint:containedctx
@@ -104,6 +123,7 @@ type FxGcpPubSubClientParam struct {
 	fx.In
 	LifeCycle fx.Lifecycle
 	Context   context.Context
+	Factory   client.ClientFactory
 	Config    *config.Config
 	Server    *pstest.Server
 }
@@ -113,7 +133,7 @@ func NewFxGcpPubSubClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 	projectID := p.Config.GetString("modules.gcppubsub.project.id")
 
 	if p.Config.IsTestEnv() {
-		client, err := pubsub.NewClient(
+		psClient, err := p.Factory.Create(
 			p.Context,
 			projectID,
 			option.WithEndpoint(p.Server.Addr),
@@ -124,21 +144,21 @@ func NewFxGcpPubSubClient(p FxGcpPubSubClientParam) (*pubsub.Client, error) {
 			return nil, fmt.Errorf("failed to create test pubsub client: %w", err)
 		}
 
-		return client, nil
+		return psClient, nil
 	}
 
-	client, err := pubsub.NewClient(p.Context, projectID)
+	psClient, err := p.Factory.Create(p.Context, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pubsub client: %w", err)
 	}
 
 	p.LifeCycle.Append(fx.Hook{
 		OnStop: func(context.Context) error {
-			return client.Close()
+			return psClient.Close()
 		},
 	})
 
-	return client, nil
+	return psClient, nil
 }
 
 // FxGcpPubSubSchemaClientParam allows injection of the required dependencies in [NewFxGcpPubSubSchemaClient].
