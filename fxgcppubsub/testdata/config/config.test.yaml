@@ -5,6 +5,9 @@ modules:
     level: debug
     output: test
   gcppubsub:
+    factory:
+      retries: 3
+      interval: 1
     healthcheck:
       topics:
         - test-topic
