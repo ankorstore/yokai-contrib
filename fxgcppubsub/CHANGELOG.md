@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/ankorstore/yokai-contrib/compare/fxgcppubsub/v1.5.0...fxgcppubsub/v1.6.0) (2025-03-05)
+
+
+### Features
+
+* **fxgcppubsub:** Added retryable client factory ([#33](https://github.com/ankorstore/yokai-contrib/issues/33)) ([02cb37d](https://github.com/ankorstore/yokai-contrib/commit/02cb37d1b398ed15c7ffdc8135cd8979f66c9394))
+
 ## [1.5.0](https://github.com/ankorstore/yokai-contrib/compare/fxgcppubsub/v1.4.1...fxgcppubsub/v1.5.0) (2025-01-21)
 
 
