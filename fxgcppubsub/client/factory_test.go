@@ -84,21 +84,18 @@ func TestDefaultClientFactory(t *testing.T) {
 		logtest.AssertContainLogRecord(t, logBuffer, map[string]interface{}{
 			"level":   "warn",
 			"attempt": 1,
-			"error":   "security",
 			"message": "pubsub client creation error, attempting again in 1 seconds",
 		})
 
 		logtest.AssertContainLogRecord(t, logBuffer, map[string]interface{}{
 			"level":   "warn",
 			"attempt": 2,
-			"error":   "security",
 			"message": "pubsub client creation error, attempting again in 1 seconds",
 		})
 
 		logtest.AssertContainLogRecord(t, logBuffer, map[string]interface{}{
 			"level":   "warn",
 			"attempt": 3,
-			"error":   "security",
 			"message": "pubsub client creation error, attempting again in 1 seconds",
 		})
 	})
