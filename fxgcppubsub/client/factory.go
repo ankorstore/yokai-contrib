@@ -36,13 +36,20 @@ func (f *DefaultClientFactory) Create(ctx context.Context, projectID string, opt
 	for attempt := 0; attempt <= attempts; attempt++ {
 		client, err := pubsub.NewClient(ctx, projectID, opts...)
 		if err == nil {
-			f.logger.Debug().Int("attempt", attempt).Msg("pubsub client creation success")
+			f.logger.
+				Debug().
+				Int("attempt", attempt+1).
+				Msg("pubsub client creation success")
 
 			return client, nil
 		}
 
 		if attempt < attempts {
-			f.logger.Warn().Err(err).Int("attempt", attempt).Msg("pubsub client creation error, attempting again")
+			f.logger.
+				Warn().
+				Err(err).
+				Int("attempt", attempt+1).
+				Msgf("pubsub client creation error, attempting again in %d seconds", int(interval.Seconds()))
 
 			time.Sleep(interval)
 		}

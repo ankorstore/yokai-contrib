@@ -4,3 +4,6 @@ modules:
   gcppubsub:
     project:
       id: ${GCP_PROJECT_ID}
+    factory:
+      attempts: 3
+      interval: 1
