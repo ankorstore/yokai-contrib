@@ -18,10 +18,11 @@ func TestFxClockworkClockModule(t *testing.T) {
 	t.Setenv("APP_CONFIG_PATH", "testdata/config")
 
 	runTest := func(tb testing.TB) clockwork.Clock {
+		tb.Helper()
 		var clock clockwork.Clock
 
 		app := fxtest.New(
-			t,
+			tb,
 			fx.NopLogger,
 			fxconfig.FxConfigModule,
 			fxclockwork.FxClockworkModule,
@@ -29,7 +30,7 @@ func TestFxClockworkClockModule(t *testing.T) {
 		)
 
 		app.RequireStart().RequireStop()
-		assert.NoError(t, app.Err())
+		assert.NoError(tb, app.Err())
 
 		return clock
 	}
