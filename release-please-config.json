@@ -25,6 +25,11 @@
       "release-type": "go",
       "component": "fxredis",
       "tag-separator": "/"
+    },
+    "fxclockwork": {
+      "release-type": "go",
+      "component": "fxclockwork",
+      "tag-separator": "/"
     }
   }
 }

@@ -1,0 +1,32 @@
+name: "fxclockwork-ci"
+
+on:
+    push:
+        branches:
+            - "feat**"
+            - "fix**"
+            - "hotfix**"
+            - "chore**"
+        paths:
+            - "fxclockwork/**.go"
+            - "fxclockwork/go.mod"
+            - "fxclockwork/go.sum"
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+        branches:
+            - main
+        paths:
+            - "fxclockwork/**.go"
+            - "fxclockwork/go.mod"
+            - "fxclockwork/go.sum"
+
+jobs:
+    ci:
+        uses: ./.github/workflows/common-ci.yml
+        secrets: inherit
+        with:
+            module: "fxclockwork"
+            go_version: "1.22"
