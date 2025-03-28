@@ -2,14 +2,12 @@ module github.com/ankorstore/yokai-contrib/fxclockwork
 
 go 1.22
 
-toolchain go1.24.1
-
 require (
-	github.com/ankorstore/yokai/config v1.3.0
-	github.com/ankorstore/yokai/fxconfig v1.1.0
+	github.com/ankorstore/yokai/config v1.5.0
+	github.com/ankorstore/yokai/fxconfig v1.3.0
 	github.com/jonboulle/clockwork v0.5.0
 	github.com/stretchr/testify v1.10.0
-	go.uber.org/fx v1.21.0
+	go.uber.org/fx v1.23.0
 )
 
 require (
