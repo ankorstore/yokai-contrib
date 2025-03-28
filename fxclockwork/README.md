@@ -10,9 +10,6 @@
 <!-- TOC -->
 * [Overview](#overview)
 * [Installation](#installation)
-* [Configuration](#configuration)
-* [Health Check](#health-check)
-* [Testing](#testing)
 <!-- TOC -->
 
 ## Overview
