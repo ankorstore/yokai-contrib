@@ -6,7 +6,8 @@
 [![Deps](https://img.shields.io/badge/osi-deps-blue)](https://deps.dev/go/github.com%2Fankorstore%2Fyokai%2Ffxclockwork)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/ankorstore/yokai/fxclockwork)](https://pkg.go.dev/github.com/ankorstore/yokai/fxclockwork)
 
-> [Fx](https://uber-go.github.io/fx/) module for [Clockwork](https://github.com/jonboulle/clockwork).
+> [Yokai](https://github.com/ankorstore/yokai) module for [Clockwork](https://github.com/jonboulle/clockwork).
+
 <!-- TOC -->
 * [Overview](#overview)
 * [Installation](#installation)
@@ -14,7 +15,7 @@
 
 ## Overview
 
-This module provides to your Fx application a [Clockwork.Clock](https://github.com/jonboulle/clockwork),
+This module provides to your [Yokai](https://github.com/ankorstore/yokai) application a [clockwork.Clock](https://github.com/jonboulle/clockwork),
 that you can `inject` anywhere.
 
 ## Installation

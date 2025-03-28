@@ -1,6 +1,7 @@
 package fxclockwork_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/ankorstore/yokai-contrib/fxclockwork"
@@ -12,63 +13,43 @@ import (
 	"go.uber.org/fx/fxtest"
 )
 
-func TestFxClockworkModule(t *testing.T) {
-	app := fxtest.New(
-		t,
-		fx.NopLogger,
-		fxclockwork.FxClockworkModule,
-		fxconfig.FxConfigModule,
-	)
-
-	app.RequireStart()
-	assert.NoError(t, app.Err(), "failed to start the Fx application")
-
-	app.RequireStop()
-	assert.NoError(t, app.Err(), "failed to stop the Fx application")
-}
-
-func TestFxClockworkClock(t *testing.T) {
+func TestFxClockworkClockModule(t *testing.T) {
 	t.Setenv("APP_ENV", config.AppEnvDev)
 	t.Setenv("APP_CONFIG_PATH", "testdata/config")
 
-	var conf *config.Config
-	var clock clockwork.Clock
+	runTest := func(tb testing.TB) clockwork.Clock {
+		var clock clockwork.Clock
 
-	app := fxtest.New(
-		t,
-		fx.NopLogger,
-		fxconfig.FxConfigModule,
-		fxclockwork.FxClockworkModule,
-		fx.Populate(&conf, &clock),
-	)
+		app := fxtest.New(
+			t,
+			fx.NopLogger,
+			fxconfig.FxConfigModule,
+			fxclockwork.FxClockworkModule,
+			fx.Populate(&clock),
+		)
 
-	app.RequireStart()
-	assert.NoError(t, app.Err(), "failed to create clockwork.Clock")
-	assert.NotNil(t, clock)
+		app.RequireStart().RequireStop()
+		assert.NoError(t, app.Err())
 
-	app.RequireStop()
-	assert.NoError(t, app.Err(), "failed to close clockwork.Clock")
-}
+		return clock
+	}
 
-func TestFxClockworkTestClock(t *testing.T) {
-	t.Setenv("APP_ENV", config.AppEnvTest)
-	t.Setenv("APP_CONFIG_PATH", "testdata/config")
+	t.Run("with real clock", func(t *testing.T) {
+		clock := runTest(t)
 
-	var conf *config.Config
-	var clock clockwork.Clock
+		assert.NotNil(t, clock)
+		assert.Implements(t, (*clockwork.Clock)(nil), clock)
+		assert.Equal(t, "*clockwork.realClock", fmt.Sprintf("%T", clock))
+	})
 
-	app := fxtest.New(
-		t,
-		fx.NopLogger,
-		fxconfig.FxConfigModule,
-		fxclockwork.FxClockworkModule,
-		fx.Populate(&conf, &clock),
-	)
+	t.Run("with test clock", func(t *testing.T) {
+		t.Setenv("APP_ENV", config.AppEnvTest)
 
-	app.RequireStart()
-	assert.NoError(t, app.Err(), "failed to create test clockwork.Clock")
-	assert.NotNil(t, clock)
+		clock := runTest(t)
 
-	app.RequireStop()
-	assert.NoError(t, app.Err(), "failed to close test clockwork.Clock")
+		assert.NotNil(t, clock)
+		assert.Implements(t, (*clockwork.Clock)(nil), clock)
+		assert.Equal(t, "*clockwork.FakeClock", fmt.Sprintf("%T", clock))
+	})
+
 }

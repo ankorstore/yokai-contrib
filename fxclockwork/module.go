@@ -25,23 +25,11 @@ type FxClockworkClockParam struct {
 	Config *config.Config
 }
 
-// NewFxClockworkClock returns a [clockwork.Clock].
+// NewFxClockworkClock returns a new [clockwork.Clock] instance.
 func NewFxClockworkClock(p FxClockworkClockParam) clockwork.Clock {
 	if p.Config.IsTestEnv() {
-		return createTestClock()
+		return clockwork.NewFakeClock()
 	} else {
-		return createClock()
+		return clockwork.NewRealClock()
 	}
-}
-
-func createClock() clockwork.Clock {
-	clock := clockwork.NewRealClock()
-
-	return clock
-}
-
-func createTestClock() clockwork.Clock {
-	clock := clockwork.NewFakeClock()
-
-	return clock
 }
