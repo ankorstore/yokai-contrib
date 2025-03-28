@@ -51,5 +51,4 @@ func TestFxClockworkClockModule(t *testing.T) {
 		assert.Implements(t, (*clockwork.Clock)(nil), clock)
 		assert.Equal(t, "*clockwork.FakeClock", fmt.Sprintf("%T", clock))
 	})
-
 }
