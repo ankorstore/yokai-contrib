@@ -29,7 +29,7 @@ type FxClockworkClockParam struct {
 func NewFxClockworkClock(p FxClockworkClockParam) clockwork.Clock {
 	if p.Config.IsTestEnv() {
 		return clockwork.NewFakeClock()
-	} else {
-		return clockwork.NewRealClock()
 	}
+
+	return clockwork.NewRealClock()
 }
