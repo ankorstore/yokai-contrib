@@ -20,6 +20,7 @@ jobs:
         - "fxjsonapi"
         - "fxslack"
         - "fxredis"
+        - "fxclickhouse"
     steps:
       - name: Checkout
         uses: actions/checkout@v4

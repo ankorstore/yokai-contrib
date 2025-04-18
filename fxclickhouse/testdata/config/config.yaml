@@ -1,0 +1,14 @@
+app:
+  name: test
+modules:
+  clickhouse:
+    debug: true
+    address:
+      - "addr1"
+      - "addr2"
+    database: db1
+    username: user1
+    password: pwd1
+    maxOpenConns: 4
+    maxIdleConns: 2
+    connOpenStrategy: inOrder
