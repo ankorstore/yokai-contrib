@@ -61,19 +61,4 @@ func TestElasticsearchClientMock(t *testing.T) {
 		assert.Nil(t, res)
 		mockClient.AssertExpectations(t)
 	})
-
-	t.Run("ExampleMethod", func(t *testing.T) {
-		mockClient := new(fxelasticsearch.ElasticsearchClientMock)
-
-		// Set up expectations
-		expectedErr := assert.AnError
-		mockClient.On("ExampleMethod").Return(expectedErr)
-
-		// Call the method
-		err := mockClient.ExampleMethod()
-
-		// Assert expectations
-		assert.Equal(t, expectedErr, err)
-		mockClient.AssertExpectations(t)
-	})
 }

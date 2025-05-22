@@ -31,12 +31,5 @@ func (m *ElasticsearchClientMock) Search(indices []string, body interface{}) (*e
 	return resp, args.Error(1)
 }
 
-// Example method (add methods as needed).
-func (m *ElasticsearchClientMock) ExampleMethod() error {
-	args := m.Called()
-
-	return args.Error(0)
-}
-
 // Ensure ElasticsearchClientMock implements ElasticsearchClientInterface.
 var _ ElasticsearchClientInterface = (*ElasticsearchClientMock)(nil)
