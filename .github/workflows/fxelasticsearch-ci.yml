@@ -1,0 +1,31 @@
+name: "fxelasticsearch-ci"
+
+on:
+    push:
+        branches:
+            - "feat**"
+            - "fix**"
+            - "hotfix**"
+            - "chore**"
+        paths:
+            - "fxelasticsearch/**.go"
+            - "fxelasticsearch/go.mod"
+            - "fxelasticsearch/go.sum"
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+        branches:
+            - main
+        paths:
+            - "fxelasticsearch/**.go"
+            - "fxelasticsearch/go.mod"
+            - "fxelasticsearch/go.sum"
+
+jobs:
+    ci:
+        uses: ./.github/workflows/common-ci.yml
+        secrets: inherit
+        with:
+            module: "fxelasticsearch" 

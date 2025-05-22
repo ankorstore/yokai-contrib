@@ -25,6 +25,11 @@
       "release-type": "go",
       "component": "fxredis",
       "tag-separator": "/"
+    },
+    "fxelasticsearch": {
+      "release-type": "go",
+      "component": "fxelasticsearch",
+      "tag-separator": "/"
     }
   }
 }

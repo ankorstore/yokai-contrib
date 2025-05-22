@@ -1,0 +1,7 @@
+app:
+  name: test-app
+modules:
+  elasticsearch:
+    address: ${ELASTICSEARCH_ADDRESS}
+    username: ${ELASTICSEARCH_USERNAME}
+    password: ${ELASTICSEARCH_PASSWORD} 
