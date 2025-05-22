@@ -28,9 +28,16 @@ type FxElasticsearchClientParam struct {
 	Factory   ElasticsearchClientFactory
 }
 
-// NewFxElasticsearchClient returns a [elasticsearch.Client].
-func NewFxElasticsearchClient(p FxElasticsearchClientParam) (*elasticsearch.Client, error) {
-	client, err := p.Factory.Create()
+// NewFxElasticsearchClient returns a [elasticsearch.Client] and a general mock in test mode.
+func NewFxElasticsearchClient(p FxElasticsearchClientParam) (*elasticsearch.Client, ElasticsearchClientInterface, error) {
+	if p.Config.IsTestEnv() {
+		mockClient := &elasticsearch.Client{}
+		generalMock := &ElasticsearchClientMock{}
 
-	return client, err
+		return mockClient, generalMock, nil
+	} else {
+		client, err := p.Factory.Create()
+
+		return client, nil, err
+	}
 }

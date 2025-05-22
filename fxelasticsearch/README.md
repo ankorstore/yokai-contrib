@@ -59,11 +59,9 @@ app:
   debug: true
 modules:
   elasticsearch:
-    address: ${ELASTICSEARCH_ADDRESS}             # Elasticsearch server address (http://localhost:9200)
-    username: ${ELASTICSEARCH_USERNAME}           # Optional: Elasticsearch username
-    password: ${ELASTICSEARCH_PASSWORD}           # Optional: Elasticsearch password
-    cloud_id: ${ELASTICSEARCH_CLOUD_ID}           # Optional: Elasticsearch Cloud ID
-    api_key: ${ELASTICSEARCH_API_KEY}             # Optional: Elasticsearch API Key
+    address: ${ELASTICSEARCH_ADDRESS}
+    username: ${ELASTICSEARCH_USERNAME}
+    password: ${ELASTICSEARCH_PASSWORD}
 ```
 
 ## Usage

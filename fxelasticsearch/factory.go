@@ -33,14 +33,5 @@ func (f *DefaultElasticsearchClientFactory) Create() (*elasticsearch.Client, err
 		cfg.Password = f.config.GetString("modules.elasticsearch.password")
 	}
 
-	// Add optional settings
-	if f.config.IsSet("modules.elasticsearch.cloud_id") {
-		cfg.CloudID = f.config.GetString("modules.elasticsearch.cloud_id")
-	}
-
-	if f.config.IsSet("modules.elasticsearch.api_key") {
-		cfg.APIKey = f.config.GetString("modules.elasticsearch.api_key")
-	}
-
 	return elasticsearch.NewClient(cfg)
 }
