@@ -90,7 +90,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ankorstore/yokai-contrib/fxelasticsearch"
+	"github.com/ankorstore/yokai-contrib/fxelasticsearch/fxelasticsearchtest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -110,7 +110,7 @@ func TestMyService_Search(t *testing.T) {
 	}`
 
 	// Create mock Elasticsearch client
-	esClient, err := fxelasticsearch.NewMockESClientWithSingleResponse(mockResponse, 200)
+	esClient, err := fxelasticsearchtest.NewMockESClientWithSingleResponse(mockResponse, 200)
 	assert.NoError(t, err)
 
 	// Use the mock client in your service

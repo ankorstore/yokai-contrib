@@ -1,4 +1,4 @@
-package fxelasticsearch
+package fxelasticsearchtest
 
 import (
 	"io"

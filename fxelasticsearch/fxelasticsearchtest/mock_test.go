@@ -1,4 +1,4 @@
-package fxelasticsearch_test
+package fxelasticsearchtest_test
 
 import (
 	"context"
@@ -8,21 +8,21 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ankorstore/yokai-contrib/fxelasticsearch"
+	"github.com/ankorstore/yokai-contrib/fxelasticsearch/fxelasticsearchtest"
 	"github.com/stretchr/testify/assert"
 )
 
 // Test the new HTTP transport-level mocking.
 func TestMockTransport(t *testing.T) {
 	t.Run("single response", func(t *testing.T) {
-		responses := []fxelasticsearch.MockResponse{
+		responses := []fxelasticsearchtest.MockResponse{
 			{
 				StatusCode:   200,
 				ResponseBody: `{"status":"ok"}`,
 			},
 		}
 
-		transport := fxelasticsearch.NewMockTransport(responses)
+		transport := fxelasticsearchtest.NewMockTransport(responses)
 
 		// Create a mock request
 		req, err := http.NewRequest(http.MethodGet, "http://localhost:9200", nil)
@@ -43,13 +43,13 @@ func TestMockTransport(t *testing.T) {
 	})
 
 	t.Run("multiple responses", func(t *testing.T) {
-		responses := []fxelasticsearch.MockResponse{
+		responses := []fxelasticsearchtest.MockResponse{
 			{StatusCode: 200, ResponseBody: `{"response":1}`},
 			{StatusCode: 201, ResponseBody: `{"response":2}`},
 			{StatusCode: 202, ResponseBody: `{"response":3}`},
 		}
 
-		transport := fxelasticsearch.NewMockTransport(responses)
+		transport := fxelasticsearchtest.NewMockTransport(responses)
 		req, _ := http.NewRequest(http.MethodGet, "http://localhost:9200", nil)
 
 		// First request
@@ -79,11 +79,11 @@ func TestMockTransport(t *testing.T) {
 
 	t.Run("error response", func(t *testing.T) {
 		expectedErr := errors.New("connection failed")
-		responses := []fxelasticsearch.MockResponse{
+		responses := []fxelasticsearchtest.MockResponse{
 			{Error: expectedErr},
 		}
 
-		transport := fxelasticsearch.NewMockTransport(responses)
+		transport := fxelasticsearchtest.NewMockTransport(responses)
 		req, _ := http.NewRequest(http.MethodGet, "http://localhost:9200", nil)
 
 		resp, err := transport.RoundTrip(req)
@@ -109,7 +109,7 @@ func TestNewMockESClient(t *testing.T) {
 			}
 		}`
 
-		client, err := fxelasticsearch.NewMockESClientWithSingleResponse(mockResponse, 200)
+		client, err := fxelasticsearchtest.NewMockESClientWithSingleResponse(mockResponse, 200)
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 
@@ -131,12 +131,12 @@ func TestNewMockESClient(t *testing.T) {
 	})
 
 	t.Run("multiple requests", func(t *testing.T) {
-		responses := []fxelasticsearch.MockResponse{
+		responses := []fxelasticsearchtest.MockResponse{
 			{StatusCode: 200, ResponseBody: `{"hits":{"total":{"value":1}}}`},
 			{StatusCode: 200, ResponseBody: `{"hits":{"total":{"value":2}}}`},
 		}
 
-		client, err := fxelasticsearch.NewMockESClient(responses)
+		client, err := fxelasticsearchtest.NewMockESClient(responses)
 		assert.NoError(t, err)
 
 		// First search
@@ -156,7 +156,7 @@ func TestNewMockESClient(t *testing.T) {
 
 	t.Run("error handling", func(t *testing.T) {
 		expectedErr := errors.New("network error")
-		client, err := fxelasticsearch.NewMockESClientWithError(expectedErr)
+		client, err := fxelasticsearchtest.NewMockESClientWithError(expectedErr)
 		assert.NoError(t, err)
 
 		res, err := client.Search()
@@ -172,7 +172,7 @@ func TestNewMockESClient(t *testing.T) {
 			}
 		}`
 
-		client, err := fxelasticsearch.NewMockESClientWithSingleResponse(errorResponse, 404)
+		client, err := fxelasticsearchtest.NewMockESClientWithSingleResponse(errorResponse, 404)
 		assert.NoError(t, err)
 
 		res, err := client.Search(client.Search.WithIndex("missing"))
@@ -185,7 +185,7 @@ func TestNewMockESClient(t *testing.T) {
 
 func TestMockTransportEdgeCases(t *testing.T) {
 	t.Run("empty responses defaults to success", func(t *testing.T) {
-		transport := fxelasticsearch.NewMockTransport([]fxelasticsearch.MockResponse{})
+		transport := fxelasticsearchtest.NewMockTransport([]fxelasticsearchtest.MockResponse{})
 		req, _ := http.NewRequest(http.MethodGet, "http://localhost:9200", nil)
 
 		resp, err := transport.RoundTrip(req)

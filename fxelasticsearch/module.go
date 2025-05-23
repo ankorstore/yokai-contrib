@@ -1,6 +1,7 @@
 package fxelasticsearch
 
 import (
+	"github.com/ankorstore/yokai-contrib/fxelasticsearch/fxelasticsearchtest"
 	"github.com/ankorstore/yokai/config"
 	"github.com/elastic/go-elasticsearch/v8"
 	"go.uber.org/fx"
@@ -39,7 +40,7 @@ func NewFxElasticsearchClient(p FxElasticsearchClientParam) (*elasticsearch.Clie
 		// This allows basic functionality to work out of the box in tests
 		defaultResponse := `{"took":1,"timed_out":false,"hits":{"total":{"value":0},"hits":[]}}`
 
-		return NewMockESClientWithSingleResponse(defaultResponse, 200)
+		return fxelasticsearchtest.NewMockESClientWithSingleResponse(defaultResponse, 200)
 	}
 	// In production, use the factory to create a real client
 	client, err := p.Factory.Create()

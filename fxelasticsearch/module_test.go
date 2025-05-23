@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ankorstore/yokai-contrib/fxelasticsearch"
+	"github.com/ankorstore/yokai-contrib/fxelasticsearch/fxelasticsearchtest"
 	"github.com/ankorstore/yokai/config"
 	"github.com/ankorstore/yokai/fxconfig"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -74,7 +75,7 @@ func TestFxElasticsearchTestClient(t *testing.T) {
 
 	// Test that we can create mock clients independently
 	mockResponse := `{"hits":{"total":{"value":1}}}`
-	mockClient, err := fxelasticsearch.NewMockESClientWithSingleResponse(mockResponse, 200)
+	mockClient, err := fxelasticsearchtest.NewMockESClientWithSingleResponse(mockResponse, 200)
 	assert.NoError(t, err)
 	assert.NotNil(t, mockClient)
 
