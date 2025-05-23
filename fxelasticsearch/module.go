@@ -23,9 +23,8 @@ var FxElasticsearchModule = fx.Module(
 // FxElasticsearchClientParam allows injection of the required dependencies in [NewElasticsearchClient].
 type FxElasticsearchClientParam struct {
 	fx.In
-	LifeCycle fx.Lifecycle
-	Config    *config.Config
-	Factory   ElasticsearchClientFactory
+	Config  *config.Config
+	Factory ElasticsearchClientFactory
 }
 
 // NewFxElasticsearchClient returns a [elasticsearch.Client].
