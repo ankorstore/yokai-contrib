@@ -62,4 +62,4 @@ linters:
     - unparam
     - unused
     - usestdlibvars
-    - whitespace 
+    - whitespace

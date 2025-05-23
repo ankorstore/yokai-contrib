@@ -3,4 +3,4 @@ app:
 modules:
   log:
     level: debug
-    output: test 
+    output: test

@@ -28,4 +28,4 @@ jobs:
         uses: ./.github/workflows/common-ci.yml
         secrets: inherit
         with:
-            module: "fxelasticsearch" 
+            module: "fxelasticsearch"
