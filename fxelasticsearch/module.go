@@ -28,16 +28,22 @@ type FxElasticsearchClientParam struct {
 	Factory   ElasticsearchClientFactory
 }
 
-// NewFxElasticsearchClient returns a [elasticsearch.Client] and a general mock in test mode.
-func NewFxElasticsearchClient(p FxElasticsearchClientParam) (*elasticsearch.Client, ElasticsearchClientInterface, error) {
+// NewFxElasticsearchClient returns a [elasticsearch.Client].
+// In test environment, it returns a default mock client with basic functionality.
+// In production, it returns a real client connected to Elasticsearch.
+//
+// For advanced testing scenarios, use NewMockESClient, NewMockESClientWithSingleResponse,
+// or NewMockESClientWithError from this package to create custom mock clients.
+func NewFxElasticsearchClient(p FxElasticsearchClientParam) (*elasticsearch.Client, error) {
 	if p.Config.IsTestEnv() {
-		mockClient := &elasticsearch.Client{}
-		generalMock := &ElasticsearchClientMock{}
+		// In test environment, provide a default mock client that returns empty successful responses
+		// This allows basic functionality to work out of the box in tests
+		defaultResponse := `{"took":1,"timed_out":false,"hits":{"total":{"value":0},"hits":[]}}`
 
-		return mockClient, generalMock, nil
-	} else {
-		client, err := p.Factory.Create()
-
-		return client, nil, err
+		return NewMockESClientWithSingleResponse(defaultResponse, 200)
 	}
+	// In production, use the factory to create a real client
+	client, err := p.Factory.Create()
+
+	return client, err
 }

@@ -1,64 +1,199 @@
 package fxelasticsearch_test
 
 import (
+	"context"
+	"errors"
+	"io"
+	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/ankorstore/yokai-contrib/fxelasticsearch"
-	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
-func TestElasticsearchClientMock(t *testing.T) {
-	t.Run("Search success", func(t *testing.T) {
-		mockClient := new(fxelasticsearch.ElasticsearchClientMock)
+// Test the new HTTP transport-level mocking.
+func TestMockTransport(t *testing.T) {
+	t.Run("single response", func(t *testing.T) {
+		responses := []fxelasticsearch.MockResponse{
+			{
+				StatusCode:   200,
+				ResponseBody: `{"status":"ok"}`,
+			},
+		}
 
-		// Set up expectations - success case
-		indices := []string{"test-index"}
-		mockClient.On("Search", indices, mock.Anything).Return(&esapi.Response{StatusCode: 200}, nil)
+		transport := fxelasticsearch.NewMockTransport(responses)
 
-		// Call the method
-		res, err := mockClient.Search(indices, nil)
-
-		// Assert expectations
+		// Create a mock request
+		req, err := http.NewRequest(http.MethodGet, "http://localhost:9200", nil)
 		assert.NoError(t, err)
-		assert.NotNil(t, res)
+
+		// Test the transport
+		resp, err := transport.RoundTrip(req)
+		assert.NoError(t, err)
+		defer resp.Body.Close()
+		assert.Equal(t, 200, resp.StatusCode)
+		assert.Equal(t, "application/json", resp.Header.Get("Content-Type"))
+		assert.Equal(t, "Elasticsearch", resp.Header.Get("X-Elastic-Product"))
+
+		// Read body
+		body, err := io.ReadAll(resp.Body)
+		assert.NoError(t, err)
+		assert.Equal(t, `{"status":"ok"}`, string(body))
+	})
+
+	t.Run("multiple responses", func(t *testing.T) {
+		responses := []fxelasticsearch.MockResponse{
+			{StatusCode: 200, ResponseBody: `{"response":1}`},
+			{StatusCode: 201, ResponseBody: `{"response":2}`},
+			{StatusCode: 202, ResponseBody: `{"response":3}`},
+		}
+
+		transport := fxelasticsearch.NewMockTransport(responses)
+		req, _ := http.NewRequest(http.MethodGet, "http://localhost:9200", nil)
+
+		// First request
+		resp1, err := transport.RoundTrip(req)
+		assert.NoError(t, err)
+		resp1.Body.Close()
+		assert.Equal(t, 200, resp1.StatusCode)
+
+		// Second request
+		resp2, err := transport.RoundTrip(req)
+		assert.NoError(t, err)
+		resp2.Body.Close()
+		assert.Equal(t, 201, resp2.StatusCode)
+
+		// Third request
+		resp3, err := transport.RoundTrip(req)
+		assert.NoError(t, err)
+		resp3.Body.Close()
+		assert.Equal(t, 202, resp3.StatusCode)
+
+		// Fourth request (should repeat last response)
+		resp4, err := transport.RoundTrip(req)
+		assert.NoError(t, err)
+		resp4.Body.Close()
+		assert.Equal(t, 202, resp4.StatusCode)
+	})
+
+	t.Run("error response", func(t *testing.T) {
+		expectedErr := errors.New("connection failed")
+		responses := []fxelasticsearch.MockResponse{
+			{Error: expectedErr},
+		}
+
+		transport := fxelasticsearch.NewMockTransport(responses)
+		req, _ := http.NewRequest(http.MethodGet, "http://localhost:9200", nil)
+
+		resp, err := transport.RoundTrip(req)
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+		assert.Equal(t, expectedErr, err)
+		assert.Nil(t, resp)
+	})
+}
+
+func TestNewMockESClient(t *testing.T) {
+	t.Run("successful search with single response", func(t *testing.T) {
+		mockResponse := `{
+			"took": 5,
+			"hits": {
+				"total": {"value": 1},
+				"hits": [
+					{
+						"_source": {"title": "test document"}
+					}
+				]
+			}
+		}`
+
+		client, err := fxelasticsearch.NewMockESClientWithSingleResponse(mockResponse, 200)
+		assert.NoError(t, err)
+		assert.NotNil(t, client)
+
+		// Perform a search
+		res, err := client.Search(
+			client.Search.WithContext(context.Background()),
+			client.Search.WithIndex("test-index"),
+			client.Search.WithBody(strings.NewReader(`{"query":{"match_all":{}}}`)),
+		)
+		assert.NoError(t, err)
 		assert.Equal(t, 200, res.StatusCode)
-		mockClient.AssertExpectations(t)
+		assert.False(t, res.IsError())
+
+		// Read and verify response body
+		defer res.Body.Close()
+		body, err := io.ReadAll(res.Body)
+		assert.NoError(t, err)
+		assert.Contains(t, string(body), "test document")
 	})
 
-	t.Run("Search with nil response", func(t *testing.T) {
-		mockClient := new(fxelasticsearch.ElasticsearchClientMock)
+	t.Run("multiple requests", func(t *testing.T) {
+		responses := []fxelasticsearch.MockResponse{
+			{StatusCode: 200, ResponseBody: `{"hits":{"total":{"value":1}}}`},
+			{StatusCode: 200, ResponseBody: `{"hits":{"total":{"value":2}}}`},
+		}
 
-		// Set up expectations - nil response case
-		indices := []string{"test-index"}
-		expectedErr := assert.AnError
-		mockClient.On("Search", indices, mock.Anything).Return(nil, expectedErr)
+		client, err := fxelasticsearch.NewMockESClient(responses)
+		assert.NoError(t, err)
 
-		// Call the method
-		res, err := mockClient.Search(indices, nil)
+		// First search
+		res1, err := client.Search()
+		assert.NoError(t, err)
+		defer res1.Body.Close()
+		body1, _ := io.ReadAll(res1.Body)
+		assert.Contains(t, string(body1), `"value":1`)
 
-		// Assert expectations
-		assert.Equal(t, expectedErr, err)
-		assert.Nil(t, res)
-		mockClient.AssertExpectations(t)
+		// Second search
+		res2, err := client.Search()
+		assert.NoError(t, err)
+		defer res2.Body.Close()
+		body2, _ := io.ReadAll(res2.Body)
+		assert.Contains(t, string(body2), `"value":2`)
 	})
 
-	t.Run("Search with invalid response type", func(t *testing.T) {
-		mockClient := new(fxelasticsearch.ElasticsearchClientMock)
+	t.Run("error handling", func(t *testing.T) {
+		expectedErr := errors.New("network error")
+		client, err := fxelasticsearch.NewMockESClientWithError(expectedErr)
+		assert.NoError(t, err)
 
-		// Set up expectations - invalid response type
-		indices := []string{"test-index"}
-		expectedErr := assert.AnError
-		// Return a string instead of *esapi.Response to trigger type assertion failure
-		mockClient.On("Search", indices, mock.Anything).Return("not a response", expectedErr)
-
-		// Call the method
-		res, err := mockClient.Search(indices, nil)
-
-		// Assert expectations
+		res, err := client.Search()
 		assert.Equal(t, expectedErr, err)
 		assert.Nil(t, res)
-		mockClient.AssertExpectations(t)
+	})
+
+	t.Run("elasticsearch error response", func(t *testing.T) {
+		errorResponse := `{
+			"error": {
+				"type": "index_not_found_exception",
+				"reason": "no such index [missing]"
+			}
+		}`
+
+		client, err := fxelasticsearch.NewMockESClientWithSingleResponse(errorResponse, 404)
+		assert.NoError(t, err)
+
+		res, err := client.Search(client.Search.WithIndex("missing"))
+		assert.NoError(t, err)
+		defer res.Body.Close()
+		assert.Equal(t, 404, res.StatusCode)
+		assert.True(t, res.IsError())
+	})
+}
+
+func TestMockTransportEdgeCases(t *testing.T) {
+	t.Run("empty responses defaults to success", func(t *testing.T) {
+		transport := fxelasticsearch.NewMockTransport([]fxelasticsearch.MockResponse{})
+		req, _ := http.NewRequest(http.MethodGet, "http://localhost:9200", nil)
+
+		resp, err := transport.RoundTrip(req)
+		assert.NoError(t, err)
+		defer resp.Body.Close()
+		assert.Equal(t, 200, resp.StatusCode)
+
+		body, _ := io.ReadAll(resp.Body)
+		assert.Equal(t, "{}", string(body))
 	})
 }
