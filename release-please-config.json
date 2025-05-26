@@ -1,6 +1,11 @@
 {
   "separate-pull-requests": true,
   "packages": {
+    "fxelasticsearch": {
+      "release-type": "go",
+      "component": "fxelasticsearch",
+      "tag-separator": "/"
+    },
     "fxgcppubsub": {
       "release-type": "go",
       "component": "fxgcppubsub",
