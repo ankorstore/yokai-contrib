@@ -10,6 +10,7 @@
 
 | Module                             | Description                                                              |
 |------------------------------------|--------------------------------------------------------------------------|
+| [fxelasticsearch](fxelasticsearch) | Module for [Elasticsearch](https://www.elastic.co/elasticsearch/)       |
 | [fxgcppubsub](fxgcppubsub)         | Module for [GCP Pub/Sub](https://cloud.google.com/pubsub)                |
 | [fxgomysqlserver](fxgomysqlserver) | Module for [Go Mysql Server](https://github.com/dolthub/go-mysql-server) |
 | [fxjsonapi](fxjsonapi)             | Module for [JSON API](https://github.com/google/jsonapi)                 |
