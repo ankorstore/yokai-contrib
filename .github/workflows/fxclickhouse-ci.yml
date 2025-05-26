@@ -1,0 +1,31 @@
+name: "fxclickhouse-ci"
+
+on:
+    push:
+        branches:
+            - "feat**"
+            - "fix**"
+            - "hotfix**"
+            - "chore**"
+        paths:
+            - "fxclickhouse/**.go"
+            - "fxclickhouse/go.mod"
+            - "fxclickhouse/go.sum"
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+        branches:
+            - main
+        paths:
+            - "fxclickhouse/**.go"
+            - "fxclickhouse/go.mod"
+            - "fxclickhouse/go.sum"
+
+jobs:
+    ci:
+        uses: ./.github/workflows/common-ci.yml
+        secrets: inherit
+        with:
+            module: "fxclickhouse"
