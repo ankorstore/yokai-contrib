@@ -28,3 +28,8 @@ modules:
           - "postgres"
           - "-c"
           - "log_statement=all"
+      
+      # Container without explicit name for testing default name assignment
+      noname:
+        image: "nginx:alpine"
+        port: "80/tcp"
