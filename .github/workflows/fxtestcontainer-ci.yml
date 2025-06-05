@@ -1,0 +1,31 @@
+name: "fxtestcontainer-ci"
+
+on:
+    push:
+        branches:
+            - "feat**"
+            - "fix**"
+            - "hotfix**"
+            - "chore**"
+        paths:
+            - "fxtestcontainer/**.go"
+            - "fxtestcontainer/go.mod"
+            - "fxtestcontainer/go.sum"
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+        branches:
+            - main
+        paths:
+            - "fxtestcontainer/**.go"
+            - "fxtestcontainer/go.mod"
+            - "fxtestcontainer/go.sum"
+
+jobs:
+    ci:
+        uses: ./.github/workflows/common-ci.yml
+        secrets: inherit
+        with:
+            module: "fxtestcontainer"

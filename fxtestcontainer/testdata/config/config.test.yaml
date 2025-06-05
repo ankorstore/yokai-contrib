@@ -1,0 +1,35 @@
+app:
+  env: test
+
+modules:
+  log:
+    level: debug
+    output: test
+  testcontainer:
+    containers:
+      redis:
+        name: "test-redis"
+        image: "redis:alpine"
+        port: "6379/tcp"
+        environment:
+          REDIS_PASSWORD: ""
+      
+      postgres:
+        name: "test-postgres"
+        image: "postgres:13"
+        port: "5432/tcp"
+        environment:
+          POSTGRES_DB: "testdb"
+          POSTGRES_USER: "testuser"
+          POSTGRES_PASSWORD: "testpass"
+        exposed_ports:
+          - "5432/tcp"
+        cmd:
+          - "postgres"
+          - "-c"
+          - "log_statement=all"
+      
+      # Container without explicit name for testing default name assignment
+      noname:
+        image: "nginx:alpine"
+        port: "80/tcp"
