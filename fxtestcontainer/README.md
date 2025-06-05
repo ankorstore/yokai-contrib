@@ -14,6 +14,7 @@
 * [Usage](#usage)
   * [Basic Usage](#basic-usage)
   * [Advanced Configuration](#advanced-configuration)
+  * [Configuration-Based Usage](#configuration-based-usage)
 * [Testing](#testing)
 <!-- TOC -->
 
@@ -161,6 +162,159 @@ func TestWithPostgres(t *testing.T) {
 		host, port.Port())
 	
 	// Connect to database and run tests...
+}
+```
+
+### Configuration-Based Usage
+
+The module also supports configuration-based container creation using YAML files.
+
+First, create a `config.test.yaml` file in your test configuration directory:
+
+```yaml
+app:
+  env: test
+
+modules:
+  testcontainer:
+    containers:
+      # Redis configuration
+      redis:
+        name: "test-redis"
+        image: "redis:alpine"
+        port: "6379/tcp"
+        environment:
+          REDIS_PASSWORD: ""
+      
+      # PostgreSQL configuration
+      postgres:
+        name: "test-postgres"
+        image: "postgres:13"
+        port: "5432/tcp"
+        environment:
+          POSTGRES_DB: "testdb"
+          POSTGRES_USER: "testuser"
+          POSTGRES_PASSWORD: "testpass"
+        exposed_ports:
+          - "5432/tcp"
+        cmd:
+          - "postgres"
+          - "-c"
+          - "log_statement=all"
+      
+      # MySQL configuration
+      mysql:
+        name: "test-mysql"
+        image: "mysql:8.0"
+        port: "3306/tcp"
+        environment:
+          MYSQL_ROOT_PASSWORD: "rootpass"
+          MYSQL_DATABASE: "testdb"
+          MYSQL_USER: "testuser"
+          MYSQL_PASSWORD: "testpass"
+      
+      # Elasticsearch configuration
+      elasticsearch:
+        name: "test-elasticsearch"
+        image: "elasticsearch:8.11.0"
+        port: "9200/tcp"
+        exposed_ports:
+          - "9200/tcp"
+          - "9300/tcp"
+        environment:
+          DISCOVERY_TYPE: "single-node"
+          XPACK_SECURITY_ENABLED: "false"
+          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+```
+
+> **Note:** The configuration above shows examples of different container types you can configure. You don't need to include all of them - just add the containers you actually need for your tests.
+
+> **Important:** Viper's map-based access methods return lowercase keys, but this module automatically converts environment variable keys back to uppercase for Docker containers. Your tests can use standard uppercase keys (e.g., `POSTGRES_PASSWORD`) when accessing the `Environment` map.
+
+Then use the configuration-based approach in your tests:
+
+```go
+package service_test
+
+import (
+	"context"
+	"testing"
+
+	"github.com/ankorstore/yokai-contrib/fxtestcontainer"
+	"github.com/ankorstore/yokai/config"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestMyService_WithConfigBasedContainers(t *testing.T) {
+	t.Setenv("APP_ENV", "test")
+	
+	ctx := context.Background()
+	
+	// Load configuration
+	cfg, err := config.NewDefaultConfigFactory().Create(config.WithFilePaths("./path/to/config"))
+	require.NoError(t, err)
+	
+	// Create factory
+	factory := fxtestcontainer.NewDefaultContainerConfigFactory(cfg)
+	
+	// Create Redis container from config
+	redisContainer, err := fxtestcontainer.CreateGenericContainerFromConfig(ctx, factory, "redis")
+	require.NoError(t, err)
+	defer redisContainer.Terminate(ctx)
+	
+	// Create PostgreSQL container from config
+	postgresContainer, err := fxtestcontainer.CreateGenericContainerFromConfig(ctx, factory, "postgres")
+	require.NoError(t, err)
+	defer postgresContainer.Terminate(ctx)
+	
+	// Get connection details
+	redisEndpoint, err := redisContainer.Endpoint(ctx, "")
+	require.NoError(t, err)
+	
+	postgresHost, err := postgresContainer.Host(ctx)
+	require.NoError(t, err)
+	postgresPort, err := postgresContainer.MappedPort(ctx, "5432")
+	require.NoError(t, err)
+	
+	// Initialize your service with container endpoints
+	service := NewMyService(redisEndpoint, postgresHost, postgresPort.Port())
+	
+	// Run your tests
+	err = service.Process(ctx, "test-data")
+	assert.NoError(t, err)
+}
+```
+
+You can also use the module with Fx dependency injection:
+
+```go
+func TestWithFxInjection(t *testing.T) {
+	t.Setenv("APP_ENV", "test")
+	
+	var factory fxtestcontainer.ContainerConfigFactory
+	
+	app := fxtest.New(
+		t,
+		fx.NopLogger,
+		fx.Provide(
+			func() (*config.Config, error) {
+				return config.NewDefaultConfigFactory().Create(config.WithFilePaths("./path/to/config"))
+			},
+		),
+		fxtestcontainer.FxTestContainerModule,
+		fx.Populate(&factory),
+	)
+	
+	app.RequireStart()
+	defer app.RequireStop()
+	
+	// Use the injected factory
+	container, err := fxtestcontainer.CreateGenericContainerFromConfig(context.Background(), factory, "redis")
+	require.NoError(t, err)
+	defer container.Terminate(context.Background())
+	
+	// Test your service...
 }
 ```
 

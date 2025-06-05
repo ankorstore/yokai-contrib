@@ -25,8 +25,16 @@ const (
 // ErrContainerImageRequired is returned when no container image is provided.
 var ErrContainerImageRequired = errors.New("container image is required")
 
+// ErrContainerConfigNotFound is returned when a container configuration is not found.
+var ErrContainerConfigNotFound = errors.New("container configuration not found")
+
 // FxTestContainerModule provides container creation functionality for Fx.
-var FxTestContainerModule = fx.Module(ModuleName)
+var FxTestContainerModule = fx.Module(
+	ModuleName,
+	fx.Provide(
+		fx.Annotate(NewDefaultContainerConfigFactory, fx.As(new(ContainerConfigFactory))),
+	),
+)
 
 // CreateGenericContainer creates a testcontainer from the provided configuration.
 func CreateGenericContainer(ctx context.Context, config *ContainerConfig) (testcontainers.Container, error) {
@@ -69,6 +77,16 @@ func CreateGenericContainer(ctx context.Context, config *ContainerConfig) (testc
 	}
 
 	return container, nil
+}
+
+// CreateGenericContainerFromConfig creates a testcontainer from a configuration key.
+func CreateGenericContainerFromConfig(ctx context.Context, factory ContainerConfigFactory, configKey string) (testcontainers.Container, error) {
+	config, err := factory.Create(configKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return CreateGenericContainer(ctx, config)
 }
 
 // ContainerConfig provides configuration for creating test containers.
