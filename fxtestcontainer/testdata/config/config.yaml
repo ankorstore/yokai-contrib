@@ -1,0 +1,13 @@
+app:
+  name: test-app
+
+modules:
+  testcontainer:
+    containers:
+      # Example: Redis container
+      # redis:
+      #   name: "my-redis"
+      #   image: "${REDIS_IMAGE:-redis:alpine}"
+      #   port: "6379/tcp"
+      #   environment:
+      #     REDIS_PASSWORD: "${REDIS_PASSWORD:-}"

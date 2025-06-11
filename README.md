@@ -14,8 +14,9 @@
 | [fxgcppubsub](fxgcppubsub)         | Module for [GCP Pub/Sub](https://cloud.google.com/pubsub)                |
 | [fxgomysqlserver](fxgomysqlserver) | Module for [Go Mysql Server](https://github.com/dolthub/go-mysql-server) |
 | [fxjsonapi](fxjsonapi)             | Module for [JSON API](https://github.com/google/jsonapi)                 |
-| [fxslack](fxslack)                 | Module for [Slack](https://api.slack.com/)                               |
 | [fxredis](fxredis)                 | Module for [Redis](https://redis.io/docs/connect/clients/go/)            |
+| [fxslack](fxslack)                 | Module for [Slack](https://api.slack.com/)                               |
+| [fxtestcontainer](fxtestcontainer) | Module for [Testcontainers](https://github.com/testcontainers/testcontainers-go) |
 
 ## Contributing
 
