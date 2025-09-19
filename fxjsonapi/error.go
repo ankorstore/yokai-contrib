@@ -131,7 +131,7 @@ func (h *ErrorHandler) handleHTTPError(c echo.Context, inErr *echo.HTTPError, ob
 		outCode = http.StatusInternalServerError
 	}
 
-	return []*jsonapi.ErrorObject{outErr}, inErr.Code
+	return []*jsonapi.ErrorObject{outErr}, outCode
 }
 
 func (h *ErrorHandler) handleValidationError(c echo.Context, inErr validator.ValidationErrors, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
