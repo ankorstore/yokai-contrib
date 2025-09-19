@@ -114,21 +114,21 @@ func (h *ErrorHandler) handleJSONAPIError(c echo.Context, inErr *jsonapi.ErrorOb
 }
 
 func (h *ErrorHandler) handleHTTPError(c echo.Context, inErr *echo.HTTPError, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
-	outErr := &jsonapi.ErrorObject{
-		ID:     httpserver.CtxRequestId(c),
-		Title:  http.StatusText(inErr.Code),
-		Detail: inErr.Error(),
-		Status: fmt.Sprintf("%d", inErr.Code),
-		Code:   fmt.Sprintf("%d", inErr.Code),
-	}
-
-	if obfuscate {
-		outErr.Detail = http.StatusText(inErr.Code)
-	}
-
 	outCode := inErr.Code
 	if outCode == 0 {
 		outCode = http.StatusInternalServerError
+	}
+
+	outErr := &jsonapi.ErrorObject{
+		ID:     httpserver.CtxRequestId(c),
+		Title:  http.StatusText(outCode),
+		Detail: inErr.Error(),
+		Status: fmt.Sprintf("%d", outCode),
+		Code:   fmt.Sprintf("%d", outCode),
+	}
+
+	if obfuscate {
+		outErr.Detail = http.StatusText(outCode)
 	}
 
 	return []*jsonapi.ErrorObject{outErr}, outCode
