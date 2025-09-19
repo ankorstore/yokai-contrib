@@ -1,6 +1,6 @@
 module github.com/ankorstore/yokai-contrib/fxjsonapi
 
-go 1.23.0
+go 1.20
 
 require (
 	github.com/ankorstore/yokai/config v1.5.0
@@ -16,9 +16,9 @@ require (
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/google/jsonapi v1.0.0
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/stretchr/testify v1.11.1
-	go.opentelemetry.io/otel v1.38.0
-	go.opentelemetry.io/otel/trace v1.38.0
+	github.com/stretchr/testify v1.10.0
+	go.opentelemetry.io/otel v1.24.0
+	go.opentelemetry.io/otel/trace v1.24.0
 	go.uber.org/fx v1.23.0
 )
 
@@ -31,7 +31,7 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
-	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
@@ -64,11 +64,10 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.24.0 // indirect
-	go.opentelemetry.io/otel/metric v1.38.0 // indirect
+	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.24.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.1.0 // indirect
 	go.uber.org/dig v1.18.0 // indirect
