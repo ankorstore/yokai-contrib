@@ -102,6 +102,10 @@ func (h *ErrorHandler) handleJSONAPIError(c echo.Context, inErr *jsonapi.ErrorOb
 		outCode = http.StatusInternalServerError
 	}
 
+	if outCode == 0 {
+		outCode = http.StatusInternalServerError
+	}
+
 	if obfuscate {
 		outErr.Detail = http.StatusText(outCode)
 	}
@@ -120,6 +124,11 @@ func (h *ErrorHandler) handleHTTPError(c echo.Context, inErr *echo.HTTPError, ob
 
 	if obfuscate {
 		outErr.Detail = http.StatusText(inErr.Code)
+	}
+
+	outCode := inErr.Code
+	if outCode == 0 {
+		outCode = http.StatusInternalServerError
 	}
 
 	return []*jsonapi.ErrorObject{outErr}, inErr.Code
