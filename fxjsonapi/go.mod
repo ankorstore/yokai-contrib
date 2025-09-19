@@ -1,6 +1,6 @@
 module github.com/ankorstore/yokai-contrib/fxjsonapi
 
-go 1.23.0
+go 1.20
 
 require (
 	github.com/ankorstore/yokai/config v1.5.0
@@ -16,7 +16,7 @@ require (
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/google/jsonapi v1.0.0
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/stretchr/testify v1.11.1
+	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/otel v1.24.0
 	go.opentelemetry.io/otel/trace v1.24.0
 	go.uber.org/fx v1.23.0
