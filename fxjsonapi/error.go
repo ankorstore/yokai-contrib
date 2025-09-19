@@ -98,11 +98,7 @@ func (h *ErrorHandler) handleJSONAPIError(c echo.Context, inErr *jsonapi.ErrorOb
 	}
 
 	outCode, err := strconv.Atoi(inErr.Status)
-	if err != nil {
-		outCode = http.StatusInternalServerError
-	}
-
-	if outCode == 0 {
+	if outCode == 0 || err != nil {
 		outCode = http.StatusInternalServerError
 	}
 
