@@ -93,6 +93,40 @@ func TestErrorHandler(t *testing.T) {
 		})
 	})
 
+	t.Run("test json api error handling with invalid status", func(t *testing.T) {
+		fn := func(fxjsonapi.Processor, echo.Context) error {
+			return &jsonapi.ErrorObject{
+				ID:     "error-id",
+				Title:  "error-title",
+				Detail: "error-detail",
+				Status: "invalid-status",
+			}
+		}
+
+		httpServer, logBuffer := runTest(t, fn)
+
+		rec := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/test", nil)
+		req.Header.Set(echo.HeaderContentType, jsonapi.MediaType)
+		req.Header.Set(echo.HeaderXRequestID, "request-id")
+
+		httpServer.ServeHTTP(rec, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rec.Code, rec.Body.String())
+
+		expected := `{"errors":[{"id":"request-id","title":"error-title","detail":"error-detail","status":"invalid-status"}]}`
+		assert.Equal(t, fmt.Sprintf("%s\n", expected), rec.Body.String())
+
+		logtest.AssertContainLogRecord(t, logBuffer, map[string]interface{}{
+			"level":     "error",
+			"code":      500,
+			"error":     "Error: error-title error-detail",
+			"errors":    "[map[detail:error-detail id:request-id status:invalid-status title:error-title]]",
+			"requestID": "request-id",
+			"message":   "json api error handler",
+		})
+	})
+
 	t.Run("test json api error handling with obfuscation", func(t *testing.T) {
 		t.Setenv("MODULES_HTTP_SERVER_ERRORS_OBFUSCATE", "true")
 
@@ -212,6 +246,35 @@ func TestErrorHandler(t *testing.T) {
 			"code":      502,
 			"error":     "code=502, message=test-error",
 			"errors":    "[map[code:502 detail:code=502, message=test-error id:request-id status:502 title:Bad Gateway]]",
+			"requestID": "request-id",
+			"message":   "json api error handler",
+		})
+	})
+
+	t.Run("test http error handling with invalid error code", func(t *testing.T) {
+		fn := func(fxjsonapi.Processor, echo.Context) error {
+			return echo.NewHTTPError(0, "test-error")
+		}
+
+		httpServer, logBuffer := runTest(t, fn)
+
+		rec := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/test", nil)
+		req.Header.Set(echo.HeaderContentType, jsonapi.MediaType)
+		req.Header.Set(echo.HeaderXRequestID, "request-id")
+
+		httpServer.ServeHTTP(rec, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rec.Code, rec.Body.String())
+
+		expected := `{"errors":[{"id":"request-id","title":"Internal Server Error","detail":"code=0, message=test-error","status":"500","code":"500"}]}`
+		assert.Equal(t, fmt.Sprintf("%s\n", expected), rec.Body.String())
+
+		logtest.AssertHasLogRecord(t, logBuffer, map[string]interface{}{
+			"level":     "error",
+			"code":      500,
+			"error":     "code=0, message=test-error",
+			"errors":    "[map[code:500 detail:code=0, message=test-error id:request-id status:500 title:Internal Server Error]]",
 			"requestID": "request-id",
 			"message":   "json api error handler",
 		})

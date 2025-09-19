@@ -98,7 +98,7 @@ func (h *ErrorHandler) handleJSONAPIError(c echo.Context, inErr *jsonapi.ErrorOb
 	}
 
 	outCode, err := strconv.Atoi(inErr.Status)
-	if err != nil {
+	if outCode == 0 || err != nil {
 		outCode = http.StatusInternalServerError
 	}
 
@@ -110,19 +110,24 @@ func (h *ErrorHandler) handleJSONAPIError(c echo.Context, inErr *jsonapi.ErrorOb
 }
 
 func (h *ErrorHandler) handleHTTPError(c echo.Context, inErr *echo.HTTPError, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
+	outCode := inErr.Code
+	if outCode == 0 {
+		outCode = http.StatusInternalServerError
+	}
+
 	outErr := &jsonapi.ErrorObject{
 		ID:     httpserver.CtxRequestId(c),
-		Title:  http.StatusText(inErr.Code),
+		Title:  http.StatusText(outCode),
 		Detail: inErr.Error(),
-		Status: fmt.Sprintf("%d", inErr.Code),
-		Code:   fmt.Sprintf("%d", inErr.Code),
+		Status: fmt.Sprintf("%d", outCode),
+		Code:   fmt.Sprintf("%d", outCode),
 	}
 
 	if obfuscate {
-		outErr.Detail = http.StatusText(inErr.Code)
+		outErr.Detail = http.StatusText(outCode)
 	}
 
-	return []*jsonapi.ErrorObject{outErr}, inErr.Code
+	return []*jsonapi.ErrorObject{outErr}, outCode
 }
 
 func (h *ErrorHandler) handleValidationError(c echo.Context, inErr validator.ValidationErrors, obfuscate bool) ([]*jsonapi.ErrorObject, int) {
