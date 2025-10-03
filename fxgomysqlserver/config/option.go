@@ -10,7 +10,6 @@ type ConfigOptions struct {
 	Listener  *bufconn.Listener
 	User      string
 	Password  string
-	Socket    string
 	Host      string
 	Port      int
 	Database  string
@@ -23,7 +22,6 @@ func DefaultGoMySQLServerConfigOptions() ConfigOptions {
 		Listener:  bufconn.Listen(DefaultMemoryBufferSize),
 		User:      DefaultUser,
 		Password:  DefaultPassword,
-		Socket:    DefaultSocket,
 		Host:      DefaultHost,
 		Port:      DefaultPort,
 		Database:  DefaultDatabase,
@@ -51,13 +49,6 @@ func WithUser(user string) GoMySQLServerConfigOption {
 func WithPassword(password string) GoMySQLServerConfigOption {
 	return func(o *ConfigOptions) {
 		o.Password = password
-	}
-}
-
-// WithSocket is used to specify the socket.
-func WithSocket(socket string) GoMySQLServerConfigOption {
-	return func(o *ConfigOptions) {
-		o.Socket = socket
 	}
 }
 

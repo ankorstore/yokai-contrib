@@ -23,7 +23,6 @@ func TestGoMySQLServerOption(t *testing.T) {
 		assert.Equal(t, config.TCPTransport, options.Config.Transport())
 		assert.Equal(t, config.DefaultUser, options.Config.User())
 		assert.Equal(t, config.DefaultPassword, options.Config.Password())
-		assert.Equal(t, config.DefaultSocket, options.Config.Socket())
 		assert.Equal(t, config.DefaultHost, options.Config.Host())
 		assert.Equal(t, config.DefaultPort, options.Config.Port())
 		assert.Equal(t, config.DefaultDatabase, options.Config.Database())

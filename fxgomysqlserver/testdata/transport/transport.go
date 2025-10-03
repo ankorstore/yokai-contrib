@@ -2,7 +2,6 @@ package transport
 
 import (
 	"net"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,26 +23,4 @@ func FindUnusedTestTCPPort(t *testing.T) int {
 	assert.NoError(t, tempListener.Close())
 
 	return port
-}
-
-// FindUnusedTestUnixSocketPath returns an unused unix socket path, for tests purposes.
-func FindUnusedTestUnixSocketPath(t *testing.T) string {
-	t.Helper()
-
-	tempFile, err := os.CreateTemp("", "mysql-*.sock")
-	if err != nil {
-		t.Errorf("cannot create temp file: %v", err)
-	}
-
-	err = tempFile.Close()
-	if err != nil {
-		t.Errorf("cannot close temp file: %v", err)
-	}
-
-	err = os.Remove(tempFile.Name())
-	if err != nil {
-		t.Errorf("cannot remove temp file: %v", err)
-	}
-
-	return tempFile.Name()
 }

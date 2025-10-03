@@ -19,7 +19,6 @@ func TestGoMySQLServerConfigOption(t *testing.T) {
 		assert.Equal(t, config.TCPTransport, options.Transport)
 		assert.Equal(t, config.DefaultUser, options.User)
 		assert.Equal(t, config.DefaultPassword, options.Password)
-		assert.Equal(t, config.DefaultSocket, options.Socket)
 		assert.Equal(t, config.DefaultHost, options.Host)
 		assert.Equal(t, config.DefaultPort, options.Port)
 		assert.Equal(t, config.DefaultDatabase, options.Database)
@@ -32,18 +31,16 @@ func TestGoMySQLServerConfigOption(t *testing.T) {
 
 		options := &config.ConfigOptions{}
 
-		config.WithTransport(config.SocketTransport)(options)
+		config.WithTransport(config.MemoryTransport)(options)
 		config.WithUser("test_user")(options)
 		config.WithPassword("test_password")(options)
-		config.WithSocket("test_socket")(options)
 		config.WithHost("test_host")(options)
 		config.WithPort(9999)(options)
 		config.WithDatabase("test_database")(options)
 
-		assert.Equal(t, config.SocketTransport, options.Transport)
+		assert.Equal(t, config.MemoryTransport, options.Transport)
 		assert.Equal(t, "test_user", options.User)
 		assert.Equal(t, "test_password", options.Password)
-		assert.Equal(t, "test_socket", options.Socket)
 		assert.Equal(t, "test_host", options.Host)
 		assert.Equal(t, 9999, options.Port)
 		assert.Equal(t, "test_database", options.Database)

@@ -8,7 +8,6 @@ type Transport string
 const (
 	UnknownTransport Transport = "unknown"
 	TCPTransport     Transport = "tcp"
-	SocketTransport  Transport = "socket"
 	MemoryTransport  Transport = "memory"
 )
 
@@ -22,7 +21,6 @@ func FetchTransport(name string) Transport {
 	//nolint:exhaustive
 	switch t := Transport(strings.ToLower(name)); t {
 	case TCPTransport,
-		SocketTransport,
 		MemoryTransport:
 		return t
 	default:

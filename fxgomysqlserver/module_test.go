@@ -24,7 +24,6 @@ func TestFxGoMySQLServerModule(t *testing.T) {
 	var server *sqle.Server
 
 	serverPort := transport.FindUnusedTestTCPPort(t)
-	serverSocket := transport.FindUnusedTestUnixSocketPath(t)
 
 	t.Run("test with tcp server", func(t *testing.T) {
 		t.Setenv("APP_CONFIG_PATH", "testdata/config")
@@ -62,51 +61,6 @@ func TestFxGoMySQLServerModule(t *testing.T) {
 
 		if tableName != "tcp" {
 			t.Errorf("expected to find tcp, but got %s", tableName)
-		}
-
-		err = db.Close()
-		assert.NoError(t, err)
-
-		app.RequireStop()
-		assert.NoError(t, app.Err())
-	})
-
-	t.Run("test with socket server", func(t *testing.T) {
-		t.Setenv("APP_CONFIG_PATH", "testdata/config")
-		t.Setenv("SERVER_TRANSPORT", "socket")
-		t.Setenv("SERVER_SOCKET", serverSocket)
-
-		app := fxtest.New(
-			t,
-			fx.NopLogger,
-			fxconfig.FxConfigModule,
-			fxlog.FxLogModule,
-			fxtrace.FxTraceModule,
-			fxgomysqlserver.FxGoMySQLServerModule,
-			fx.Populate(&server),
-		)
-
-		app.RequireStart()
-		assert.NoError(t, app.Err())
-
-		db, err := sql.Open("mysql", fmt.Sprintf("user:password@unix(%s)/db", serverSocket))
-		assert.NoError(t, err)
-
-		err = db.Ping()
-		assert.NoError(t, err)
-
-		_, err = db.Exec("CREATE TABLE socket (id int)")
-		assert.NoError(t, err)
-
-		row := db.QueryRow("SHOW TABLES")
-		assert.NoError(t, row.Err())
-
-		var tableName string
-		err = row.Scan(&tableName)
-		assert.NoError(t, err)
-
-		if tableName != "socket" {
-			t.Errorf("expected to find socket, but got %s", tableName)
 		}
 
 		err = db.Close()

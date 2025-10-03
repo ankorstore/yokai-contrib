@@ -44,27 +44,6 @@ func TestDefaultGoMySQLServerFactory(t *testing.T) {
 		srv.Listener.Close()
 	})
 
-	t.Run("test socket server creation", func(t *testing.T) {
-		t.Parallel()
-
-		serverSocket := transport.FindUnusedTestUnixSocketPath(t)
-
-		serverConfig := config.NewGoMySQLServerConfig(
-			config.WithTransport(config.SocketTransport),
-			config.WithSocket(serverSocket),
-		)
-
-		srv, err := server.NewDefaultGoMySQLServerFactory().Create(
-			server.WithConfig(serverConfig),
-		)
-		assert.NoError(t, err)
-
-		assert.IsType(t, &sqle.Server{}, srv)
-		assert.Equal(t, "unix", srv.Listener.Addr().Network())
-
-		srv.Listener.Close()
-	})
-
 	t.Run("test memory server creation", func(t *testing.T) {
 		t.Parallel()
 

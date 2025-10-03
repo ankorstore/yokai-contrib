@@ -9,6 +9,7 @@ import (
 	sqle "github.com/dolthub/go-mysql-server"
 	"github.com/dolthub/go-mysql-server/memory"
 	"github.com/dolthub/go-mysql-server/server"
+	"github.com/dolthub/go-mysql-server/sql"
 	"github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
 )
@@ -66,9 +67,6 @@ func (f *DefaultGoMySQLServerFactory) Create(options ...GoMySQLServerOption) (*s
 	case config.TCPTransport:
 		serverConfig.Protocol = "tcp"
 		serverConfig.Address = fmt.Sprintf("%s:%d", serverOptions.Config.Host(), serverOptions.Config.Port())
-	case config.SocketTransport:
-		serverConfig.Protocol = "unix"
-		serverConfig.Socket = serverOptions.Config.Socket()
 	case config.MemoryTransport:
 		serverConfig.Protocol = "memory"
 		serverConfig.Listener = serverOptions.Config.Listener()
@@ -90,5 +88,5 @@ func (f *DefaultGoMySQLServerFactory) Create(options ...GoMySQLServerOption) (*s
 	}
 
 	// create server
-	return server.NewServer(serverConfig, serverEngine, serverSessionBuilder, nil)
+	return server.NewServer(serverConfig, serverEngine, sql.NewContext, serverSessionBuilder, nil)
 }

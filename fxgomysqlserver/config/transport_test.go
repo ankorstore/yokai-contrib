@@ -22,10 +22,6 @@ func TestTransport(t *testing.T) {
 				"tcp",
 			},
 			{
-				config.SocketTransport,
-				"socket",
-			},
-			{
 				config.MemoryTransport,
 				"memory",
 			},
@@ -58,18 +54,6 @@ func TestTransport(t *testing.T) {
 			{
 				"Tcp",
 				config.TCPTransport,
-			},
-			{
-				"socket",
-				config.SocketTransport,
-			},
-			{
-				"SOCKET",
-				config.SocketTransport,
-			},
-			{
-				"Socket",
-				config.SocketTransport,
 			},
 			{
 				"memory",
