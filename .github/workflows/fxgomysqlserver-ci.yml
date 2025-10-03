@@ -29,4 +29,4 @@ jobs:
         secrets: inherit
         with:
             module: "fxgomysqlserver"
-            go_version: "1.22"
+            go_version: "1.23"
