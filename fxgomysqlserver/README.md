@@ -14,7 +14,6 @@
 * [Configuration](#configuration)
 * [Usage](#usage)
   * [TCP transport](#tcp-transport)
-  * [Socket transport](#socket-transport)
   * [Memory transport](#memory-transport)
 * [Testing](#testing)
 <!-- TOC -->
@@ -73,8 +72,7 @@ app:
 modules:
   gomysqlserver:
     config:
-      transport: tcp            # transport to use: tcp, socket or memory (tcp by default)
-      socket: /tmp/mysql.sock   # socket path (/tmp/mysql.sock by default)
+      transport: tcp            # transport to use: tcp or memory (tcp by default)
       user: user                # database user name (user by default)
       password: password        # database user password (password by default)
       host: localhost           # database host (localhost by default)
@@ -111,30 +109,6 @@ And then connect with:
 import "database/sql"
 
 db, _ := sql.Open("mysql", "user:password@tcp(localhost:3306)/db")
-```
-
-### Socket transport
-
-You can configure the server to accept `socket` connections:
-
-```yaml
-# ./configs/config.yaml
-modules:
-  gomysqlserver:
-    config:
-      transport: socket
-      socket: /tmp/mysql.sock 
-      user: user
-      password: password
-      database: db
-```
-
-And then connect with:
-
-```go
-import "database/sql"
-
-db, _ := sql.Open("mysql", "user:password@unix(/tmp/mysql.sock)/db")
 ```
 
 ### Memory transport
