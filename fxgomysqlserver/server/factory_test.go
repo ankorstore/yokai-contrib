@@ -12,11 +12,7 @@ import (
 )
 
 func TestDefaultGoMySQLServerFactory(t *testing.T) {
-	t.Parallel()
-
 	t.Run("test implementation", func(t *testing.T) {
-		t.Parallel()
-
 		serverFactory := server.NewDefaultGoMySQLServerFactory()
 
 		assert.IsType(t, &server.DefaultGoMySQLServerFactory{}, serverFactory)
@@ -24,8 +20,6 @@ func TestDefaultGoMySQLServerFactory(t *testing.T) {
 	})
 
 	t.Run("test tcp server creation", func(t *testing.T) {
-		t.Parallel()
-
 		serverPort := transport.FindUnusedTestTCPPort(t)
 
 		serverConfig := config.NewGoMySQLServerConfig(
@@ -45,8 +39,6 @@ func TestDefaultGoMySQLServerFactory(t *testing.T) {
 	})
 
 	t.Run("test memory server creation", func(t *testing.T) {
-		t.Parallel()
-
 		serverConfig := config.NewGoMySQLServerConfig(
 			config.WithTransport(config.MemoryTransport),
 		)
@@ -63,8 +55,6 @@ func TestDefaultGoMySQLServerFactory(t *testing.T) {
 	})
 
 	t.Run("test creation failure with invalid transport", func(t *testing.T) {
-		t.Parallel()
-
 		serverConfig := config.NewGoMySQLServerConfig(
 			config.WithTransport(config.UnknownTransport),
 		)
