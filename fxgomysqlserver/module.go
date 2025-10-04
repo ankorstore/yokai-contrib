@@ -57,7 +57,6 @@ func NewFxGoMySQLServerConfig(p FxGoMySQLServerConfigParam) (*config.GoMySQLServ
 		config.WithTransport(transport),
 		config.WithUser(p.Config.GetString("modules.gomysqlserver.config.user")),
 		config.WithPassword(p.Config.GetString("modules.gomysqlserver.config.password")),
-		config.WithSocket(p.Config.GetString("modules.gomysqlserver.config.socket")),
 		config.WithHost(p.Config.GetString("modules.gomysqlserver.config.host")),
 		config.WithPort(p.Config.GetInt("modules.gomysqlserver.config.port")),
 		config.WithDatabase(p.Config.GetString("modules.gomysqlserver.config.database")),

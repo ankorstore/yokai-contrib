@@ -9,7 +9,6 @@ import (
 const (
 	DefaultUser             = "user"
 	DefaultPassword         = "password"
-	DefaultSocket           = "/tmp/mysql.sock"
 	DefaultHost             = "localhost"
 	DefaultPort             = 3306
 	DefaultDatabase         = "db"
@@ -24,7 +23,6 @@ type GoMySQLServerConfig struct {
 	listener  *bufconn.Listener
 	user      string
 	password  string
-	socket    string
 	host      string
 	port      int
 	database  string
@@ -44,7 +42,6 @@ func NewGoMySQLServerConfig(options ...GoMySQLServerConfigOption) *GoMySQLServer
 		listener:  configOptions.Listener,
 		user:      configOptions.User,
 		password:  configOptions.Password,
-		socket:    configOptions.Socket,
 		host:      configOptions.Host,
 		port:      configOptions.Port,
 		database:  configOptions.Database,
@@ -69,11 +66,6 @@ func (c *GoMySQLServerConfig) User() string {
 // Password returns the configuration password.
 func (c *GoMySQLServerConfig) Password() string {
 	return c.password
-}
-
-// Socket returns the configuration socket.
-func (c *GoMySQLServerConfig) Socket() string {
-	return c.socket
 }
 
 // Host returns the configuration host.
@@ -102,14 +94,6 @@ func (c *GoMySQLServerConfig) DSN() (string, error) {
 			c.Password(),
 			c.Host(),
 			c.Port(),
-			c.Database(),
-		), nil
-	case SocketTransport:
-		return fmt.Sprintf(
-			"%s:%s@unix(%s)/%s",
-			c.User(),
-			c.Password(),
-			c.Socket(),
 			c.Database(),
 		), nil
 	case MemoryTransport:

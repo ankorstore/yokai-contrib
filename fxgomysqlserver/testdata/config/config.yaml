@@ -9,7 +9,6 @@ modules:
   gomysqlserver:
     config:
       transport: ${SERVER_TRANSPORT}
-      socket: ${SERVER_SOCKET}
       user: user
       password: password
       host: 127.0.0.1

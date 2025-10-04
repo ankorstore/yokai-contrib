@@ -18,15 +18,3 @@ func TestFindUnusedTestTCPPort(t *testing.T) {
 	assert.NotEqual(t, port2, port3)
 	assert.NotEqual(t, port1, port3)
 }
-
-func TestFindUnusedTestUnixSocketPath(t *testing.T) {
-	t.Parallel()
-
-	path1 := transport.FindUnusedTestUnixSocketPath(t)
-	path2 := transport.FindUnusedTestUnixSocketPath(t)
-	path3 := transport.FindUnusedTestUnixSocketPath(t)
-
-	assert.NotEqual(t, path1, path2)
-	assert.NotEqual(t, path2, path3)
-	assert.NotEqual(t, path1, path3)
-}
