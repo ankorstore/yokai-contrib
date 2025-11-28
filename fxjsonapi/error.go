@@ -28,6 +28,8 @@ func NewErrorHandler(config *config.Config) *ErrorHandler {
 }
 
 // Handle returns the Echo compatible echo.HTTPErrorHandler.
+//
+//nolint:cyclop
 func (h *ErrorHandler) Handle() echo.HTTPErrorHandler {
 	obfuscate := h.config.GetBool("modules.http.server.errors.obfuscate")
 
@@ -56,12 +58,21 @@ func (h *ErrorHandler) Handle() echo.HTTPErrorHandler {
 			outErrors, outCode = h.handleGenericError(c, err, obfuscate)
 		}
 
-		logger.
-			Error().
-			Err(err).
-			Any("errors", outErrors).
-			Int("code", outCode).
-			Msg("json api error handler")
+		if outCode >= http.StatusInternalServerError {
+			logger.
+				Error().
+				Err(err).
+				Any("errors", outErrors).
+				Int("code", outCode).
+				Msg("json api error handler")
+		} else {
+			logger.
+				Info().
+				Err(err).
+				Any("errors", outErrors).
+				Int("code", outCode).
+				Msg("json api error handler")
+		}
 
 		c.Set("Content-Type", jsonapi.MediaType)
 
