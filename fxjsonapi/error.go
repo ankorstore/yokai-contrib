@@ -28,6 +28,8 @@ func NewErrorHandler(config *config.Config) *ErrorHandler {
 }
 
 // Handle returns the Echo compatible echo.HTTPErrorHandler.
+//
+//nolint:cyclop
 func (h *ErrorHandler) Handle() echo.HTTPErrorHandler {
 	obfuscate := h.config.GetBool("modules.http.server.errors.obfuscate")
 
