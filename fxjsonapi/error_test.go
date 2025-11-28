@@ -182,7 +182,7 @@ func TestErrorHandler(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("%s\n", expected), rec.Body.String())
 
 		logtest.AssertHasLogRecord(t, logBuffer, map[string]interface{}{
-			"level":     "error",
+			"level":     "info",
 			"code":      400,
 			"error":     "",
 			"errors":    "[]",
@@ -213,7 +213,7 @@ func TestErrorHandler(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("%s\n", expected), rec.Body.String())
 
 		logtest.AssertHasLogRecord(t, logBuffer, map[string]interface{}{
-			"level":     "error",
+			"level":     "info",
 			"code":      400,
 			"error":     "",
 			"errors":    "[]",

@@ -81,7 +81,7 @@ func TestFxJSONAPIModule(t *testing.T) {
 		})
 
 		logtest.AssertHasLogRecord(t, logBuffer, map[string]interface{}{
-			"level":   "error",
+			"level":   "info",
 			"code":    http.StatusUnsupportedMediaType,
 			"error":   "code=415, message=JSON API request invalid content type",
 			"message": "json api error handler",
@@ -110,7 +110,7 @@ func TestFxJSONAPIModule(t *testing.T) {
 		})
 
 		logtest.AssertHasLogRecord(t, logBuffer, map[string]interface{}{
-			"level":   "error",
+			"level":   "info",
 			"code":    http.StatusBadRequest,
 			"error":   "code=400, message=invalid character 'i' looking for beginning of value",
 			"message": "json api error handler",
