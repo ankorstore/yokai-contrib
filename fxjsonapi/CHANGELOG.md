@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/ankorstore/yokai-contrib/compare/fxjsonapi/v1.1.0...fxjsonapi/v1.2.0) (2025-11-28)
+
+
+### Features
+
+* **fxjsonapi:** Lowered log level in case of non internal server errors ([#46](https://github.com/ankorstore/yokai-contrib/issues/46)) ([8a3505d](https://github.com/ankorstore/yokai-contrib/commit/8a3505de95457778e0c35e991b870b5cf72a1081))
+
 ## [1.1.0](https://github.com/ankorstore/yokai-contrib/compare/fxjsonapi/v1.0.0...fxjsonapi/v1.1.0) (2025-09-19)
 
 
