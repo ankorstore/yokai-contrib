@@ -2,8 +2,6 @@ module github.com/ankorstore/yokai-contrib/fxtestcontainer
 
 go 1.23.0
 
-toolchain go1.24.12
-
 require (
 	github.com/ankorstore/yokai/config v1.5.0
 	github.com/docker/go-connections v0.5.0
