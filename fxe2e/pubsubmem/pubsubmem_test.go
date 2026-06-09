@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/ankorstore/yokai-contrib/fxgcppubsub/topic"
 	"github.com/ankorstore/yokai-contrib/fxe2e/recorder"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/topic"
 	"github.com/onsi/gomega"
 )
 

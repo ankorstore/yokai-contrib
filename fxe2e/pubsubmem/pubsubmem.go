@@ -20,9 +20,9 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/ankorstore/go-modules/gcppubsub"
-	"github.com/ankorstore/yokai-contrib/fxgcppubsub/topic"
 	"github.com/ankorstore/yokai-contrib/fxe2e/e2e"
 	"github.com/ankorstore/yokai-contrib/fxe2e/recorder"
+	"github.com/ankorstore/yokai-contrib/fxgcppubsub/topic"
 	"go.uber.org/fx"
 )
 
