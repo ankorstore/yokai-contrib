@@ -1,0 +1,33 @@
+name: "fxe2e-ci"
+
+on:
+    push:
+        branches:
+            - "feat**"
+            - "fix**"
+            - "hotfix**"
+            - "chore**"
+        paths:
+            - "fxe2e/**.go"
+            - "fxe2e/go.mod"
+            - "fxe2e/go.sum"
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+        branches:
+            - main
+        paths:
+            - "fxe2e/**.go"
+            - "fxe2e/go.mod"
+            - "fxe2e/go.sum"
+
+jobs:
+    ci:
+        uses: ./.github/workflows/common-ci.yml
+        secrets: inherit
+        with:
+            module: "fxe2e"
+            go_version: "1.24"
+            linter_version: "1.64.8"

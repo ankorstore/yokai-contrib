@@ -10,6 +10,7 @@
 
 | Module                             | Description                                                              |
 |------------------------------------|--------------------------------------------------------------------------|
+| [fxe2e](fxe2e)                     | Declarative, file-driven end-to-end test harness for Yokai apps          |
 | [fxelasticsearch](fxelasticsearch) | Module for [Elasticsearch](https://www.elastic.co/elasticsearch/)       |
 | [fxgcppubsub](fxgcppubsub)         | Module for [GCP Pub/Sub](https://cloud.google.com/pubsub)                |
 | [fxgomysqlserver](fxgomysqlserver) | Module for [Go Mysql Server](https://github.com/dolthub/go-mysql-server) |
