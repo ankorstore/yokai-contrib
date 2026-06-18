@@ -23,11 +23,11 @@ jobs:
         - "fxtestcontainer"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
       - name: Install Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: "1.22"
           check-latest: true
@@ -44,7 +44,7 @@ jobs:
         working-directory: ${{ matrix.module }}
         run: rm coverage.tmp.out
       - name: Codecov for module ${{ matrix.module }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v7
         with:
           fail_ci_if_error: false
           flags: ${{ matrix.module }}
